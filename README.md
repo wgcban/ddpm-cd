@@ -1,6 +1,8 @@
-# Image Super-Resolution via Iterative Refinement
+# Hyperspectral Pansharpening via Conditional Denoising Diffusion Probabilistic Model
 
-[Paper](https://arxiv.org/pdf/2104.07636.pdf ) |  [Project](https://iterative-refinement.github.io/ )
+[Wele Gedara Chaminda Bandara](https://www.wgcban.com/), [Vishal M. Patel](https://engineering.jhu.edu/vpatel36/sciencex_teams/vishalpatel/)
+
+[Paper]() |  [Project]()
 
 
 
