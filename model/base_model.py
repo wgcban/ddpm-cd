@@ -30,13 +30,13 @@ class BaseModel():
         if isinstance(x, dict):
             for key, item in x.items():
                 if item is not None:
-                    x[key] = item.to(self.device)
+                    x[key] = item.to(self.device, dtype=torch.float)
         elif isinstance(x, list):
             for item in x:
                 if item is not None:
-                    item = item.to(self.device)
+                    item = item.to(self.device, dtype=torch.float)
         else:
-            x = x.to(self.device)
+            x = x.to(self.device, dtype=torch.float)
         return x
 
     def get_network_description(self, network):

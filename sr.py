@@ -12,7 +12,7 @@ import numpy as np
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', type=str, default='config/sr_sr3_16_128.json',
+    parser.add_argument('-c', '--config', type=str, default='config/sr_pavia.json',
                         help='JSON file for configuration')
     parser.add_argument('-p', '--phase', type=str, choices=['train', 'val'],
                         help='Run either train(training) or val(generation)', default='train')
@@ -53,8 +53,8 @@ if __name__ == "__main__":
     # dataset
     for phase, dataset_opt in opt['datasets'].items():
         if phase == 'train' and args.phase != 'val':
-            train_set = Data.create_dataset(dataset_opt, phase)
-            train_loader = Data.create_dataloader(
+            train_set   = Data.create_dataset(dataset_opt, phase)
+            train_loader= Data.create_dataloader(
                 train_set, dataset_opt, phase)
         elif phase == 'val':
             val_set = Data.create_dataset(dataset_opt, phase)

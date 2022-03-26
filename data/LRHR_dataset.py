@@ -4,7 +4,10 @@ from PIL import Image
 from torch.utils.data import Dataset
 import random
 import data.util as Util
+import scipy
+import scipy.io
 
+import numpy as np
 
 class LRHRDataset(Dataset):
     def __init__(self, dataroot, datatype, l_resolution=16, r_resolution=128, split='train', data_len=-1, need_LR=False):
@@ -38,6 +41,21 @@ class LRHRDataset(Dataset):
                 self.data_len = self.dataset_len
             else:
                 self.data_len = min(self.data_len, self.dataset_len)
+        elif datatype == 'mat':
+            self.sr_path = Util.get_paths_from_mat(
+                '{}/sr_{}_{}'.format(dataroot, l_resolution, r_resolution))
+            self.hr_path = Util.get_paths_from_mat(
+                '{}/hr_{}'.format(dataroot, r_resolution))
+            self.p_path = Util.get_paths_from_mat(
+                '{}/p_{}'.format(dataroot, r_resolution))
+            if self.need_LR:
+                self.lr_path = Util.get_paths_from_mat(
+                    '{}/lr_{}'.format(dataroot, l_resolution))
+            self.dataset_len = len(self.hr_path)
+            if self.data_len <= 0:
+                self.data_len = self.dataset_len
+            else:
+                self.data_len = min(self.data_len, self.dataset_len)
         else:
             raise NotImplementedError(
                 'data_type [{:s}] is not recognized.'.format(datatype))
@@ -48,6 +66,7 @@ class LRHRDataset(Dataset):
     def __getitem__(self, index):
         img_HR = None
         img_LR = None
+        img_P  = None
 
         if self.datatype == 'lmdb':
             with self.env.begin(write=False) as txn:
@@ -84,16 +103,25 @@ class LRHRDataset(Dataset):
                 img_SR = Image.open(BytesIO(sr_img_bytes)).convert("RGB")
                 if self.need_LR:
                     img_LR = Image.open(BytesIO(lr_img_bytes)).convert("RGB")
-        else:
+        elif self.datatype == 'img':
             img_HR = Image.open(self.hr_path[index]).convert("RGB")
             img_SR = Image.open(self.sr_path[index]).convert("RGB")
             if self.need_LR:
                 img_LR = Image.open(self.lr_path[index]).convert("RGB")
+        elif self.datatype == 'mat':
+            img_HR = scipy.io.loadmat(self.hr_path[index])['hr'].transpose(2, 0, 1)
+            img_P  = np.expand_dims(scipy.io.loadmat(self.p_path[index])['p'], 0)
+            img_SR = np.array(scipy.io.loadmat(self.sr_path[index])['sr'].transpose(2, 0, 1))
+            
+            if self.need_LR:
+                img_LR = scipy.io.loadmat(self.lr_path[index])['lr'].transpose(2, 0, 1)
+
         if self.need_LR:
-            [img_LR, img_SR, img_HR] = Util.transform_augment(
-                [img_LR, img_SR, img_HR], split=self.split, min_max=(-1, 1))
-            return {'LR': img_LR, 'HR': img_HR, 'SR': img_SR, 'Index': index}
+            [img_LR, img_SR, img_P, img_HR] = Util.transform_augment_hsi(
+                [img_LR, img_SR, img_P, img_HR], split=self.split, min_max=(-1, 1))
+            return {'LR': img_LR, 'HR': img_HR, 'SR': img_SR, 'P': img_P,'Index': index}
         else:
-            [img_SR, img_HR] = Util.transform_augment(
-                [img_SR, img_HR], split=self.split, min_max=(-1, 1))
-            return {'HR': img_HR, 'SR': img_SR, 'Index': index}
+            [img_SR, img_P, img_HR] = Util.transform_augment_hsi(
+                [img_SR, img_P, img_HR], split=self.split, min_max=(-1, 1))
+            
+            return {'HR': img_HR, 'SR': img_SR, 'P': img_P, 'Index': index}
