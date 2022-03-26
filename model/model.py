@@ -62,10 +62,10 @@ class DDPM(BaseModel):
         with torch.no_grad():
             if isinstance(self.netG, nn.DataParallel):
                 self.SR = self.netG.module.super_resolution(
-                    self.data['SR'], continous)
+                    self.data, continous)
             else:
                 self.SR = self.netG.super_resolution(
-                    self.data['SR'], continous)
+                    self.data, continous)
         self.netG.train()
 
     def sample(self, batch_size=1, continous=False):

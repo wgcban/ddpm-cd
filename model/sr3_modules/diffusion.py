@@ -178,7 +178,7 @@ class GaussianDiffusion(nn.Module):
         device = self.betas.device
         sample_inter = (1 | (self.num_timesteps//10))
         if not self.conditional:
-            shape = x_in
+            shape = x_in['SR']
             img = torch.randn(shape, device=device)
             ret_img = img
             for i in tqdm(reversed(range(0, self.num_timesteps)), desc='sampling loop time step', total=self.num_timesteps):
@@ -186,12 +186,12 @@ class GaussianDiffusion(nn.Module):
                 if i % sample_inter == 0:
                     ret_img = torch.cat([ret_img, img], dim=0)
         else:
-            x = x_in
+            x = x_in['SR']
             shape = x.shape
             img = torch.randn(shape, device=device)
             ret_img = x
             for i in tqdm(reversed(range(0, self.num_timesteps)), desc='sampling loop time step', total=self.num_timesteps):
-                img = self.p_sample(img, i, condition_x=x)
+                img = self.p_sample(img, i, condition_x=torch.cat((x_in['P'], x_in['SR']), dim=1))
                 if i % sample_inter == 0:
                     ret_img = torch.cat([ret_img, img], dim=0)
         if continous:

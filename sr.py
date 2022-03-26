@@ -60,6 +60,9 @@ if __name__ == "__main__":
             val_set = Data.create_dataset(dataset_opt, phase)
             val_loader = Data.create_dataloader(
                 val_set, dataset_opt, phase)
+    R = opt['datasets']["RGB"]["R"]
+    G = opt['datasets']["RGB"]["G"]
+    B = opt['datasets']["RGB"]["B"]
     logger.info('Initial Dataset Finished')
 
     # model
@@ -114,10 +117,10 @@ if __name__ == "__main__":
                         diffusion.feed_data(val_data)
                         diffusion.test(continous=False)
                         visuals = diffusion.get_current_visuals()
-                        sr_img = Metrics.tensor2img(visuals['SR'])  # uint8
-                        hr_img = Metrics.tensor2img(visuals['HR'])  # uint8
-                        lr_img = Metrics.tensor2img(visuals['LR'])  # uint8
-                        fake_img = Metrics.tensor2img(visuals['INF'])  # uint8
+                        sr_img = Metrics.tensor2img(visuals['SR'][(R, G, B), :, :])  # uint8
+                        hr_img = Metrics.tensor2img(visuals['HR'][0, (R, G, B), :, :])  # uint8
+                        lr_img = Metrics.tensor2img(visuals['LR'][0, (R, G, B), :, :])  # uint8
+                        fake_img = Metrics.tensor2img(visuals['INF'][0, (R, G, B), :, :])  # uint8
 
                         # generation
                         Metrics.save_img(
