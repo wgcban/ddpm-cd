@@ -95,6 +95,6 @@
         }
     },
     "wandb": {
-        "project": "sr_ffhq"
+        "project": "sr_pavia"
     }
 }
