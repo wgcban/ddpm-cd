@@ -1,5 +1,5 @@
 {
-    "name": "pansharpening-pavia-center-dataset",
+    "name": "pansharpening-pavia-center-dataset-DDPM",
     "phase": "train", // train or val
     "gpu_ids": [
         0
