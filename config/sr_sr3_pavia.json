@@ -27,7 +27,7 @@
         },
         "val": {
             "name": "pavia_40_160_val",
-            "mode": "LRHR",
+            "mode": "HR",
             "dataroot": "dataset/pavia_center/val",
             "datatype": "mat", //lmdb or img, path of img files
             "l_resolution": 40,
@@ -75,7 +75,7 @@
         },
         "diffusion": {
             "image_size": 160,
-            "channels": 120, //sample channel
+            "channels": 102, //sample channel
             "conditional": true // unconditional generation or unconditional generation(super_resolution)
         }
     },

@@ -1,0 +1,100 @@
+{
+    "name": "pansharpening-pavia-center-dataset",
+    "phase": "train", // train or val
+    "gpu_ids": [
+        0
+    ],
+    "path": { //set the path
+        "log": "logs",
+        "tb_logger": "tb_logger",
+        "results": "results",
+        "checkpoint": "checkpoint",
+        "resume_state": null
+        // "resume_state": "experiments/sr_ffhq_210806_204158/checkpoint/I640000_E37" //pretrain model or training state
+    },
+    "datasets": {
+        "train": {
+            "name": "pavia_40_160_train",
+            "mode": "HR", // whether need LR img
+            "dataroot": "dataset/pavia_center/train",
+            "datatype": "mat", //lmdb or img, path of img files
+            "l_resolution": 40, // low resolution need to super_resolution
+            "r_resolution": 160, // high resolution
+            "batch_size": 4,
+            "num_workers": 8,
+            "use_shuffle": true,
+            "data_len": -1 // -1 represents all data used in train
+        },
+        "val": {
+            "name": "pavia_40_160_val",
+            "mode": "HR",
+            "dataroot": "dataset/pavia_center/val",
+            "datatype": "mat", //lmdb or img, path of img files
+            "l_resolution": 40,
+            "r_resolution": 160,
+            "data_len": 50 // data length in validation 
+        },  
+        "RGB": {
+            "R": 60,
+            "G": 30,
+            "B": 10}
+    },
+    "model": {
+        "which_model_G": "ddpm", // use the ddpm or sr3 network structure
+        "finetune_norm": false,
+        "unet": {
+            "in_channel": 205,
+            "out_channel": 102,
+            "inner_channel": 64,
+            "channel_multiplier": [
+                1,
+                2,
+                4,
+                8,
+                8
+            ],
+            "attn_res": [
+                16
+            ],
+            "res_blocks": 2,
+            "dropout": 0.2
+        },
+        "beta_schedule": { // use munual beta_schedule for acceleration
+            "train": {
+                "schedule": "linear",
+                "n_timestep": 2000,
+                "linear_start": 1e-6,
+                "linear_end": 1e-2
+            },
+            "val": {
+                "schedule": "linear",
+                "n_timestep": 2000,
+                "linear_start": 1e-6,
+                "linear_end": 1e-2
+            }
+        },
+        "diffusion": {
+            "image_size": 160,
+            "channels": 102, //sample channel
+            "conditional": true // unconditional generation or unconditional generation(super_resolution)
+        }
+    },
+    "train": {
+        "n_iter": 1000000,
+        "val_freq": 1e4,
+        "save_checkpoint_freq": 1e4,
+        "print_freq": 200,
+        "optimizer": {
+            "type": "adam",
+            "lr": 1e-4
+        },
+        "ema_scheduler": { // not used now
+            "step_start_ema": 5000,
+            "update_ema_every": 1,
+            "ema_decay": 0.9999
+        }
+    },
+    "wandb": {
+        "project": "sr_ffhq"
+    }
+}

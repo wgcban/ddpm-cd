@@ -289,7 +289,7 @@ class GaussianDiffusion(nn.Module):
             x_recon = self.denoise_fn(x_noisy, t)
         else:
             x_recon = self.denoise_fn(
-                torch.cat([x_in['SR'], x_noisy], dim=1), t)
+                torch.cat([x_in['P'], x_in['SR'], x_noisy], dim=1), t)
         loss = self.loss_func(noise, x_recon)
 
         return loss
