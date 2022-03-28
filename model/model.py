@@ -36,8 +36,16 @@ class DDPM(BaseModel):
             else:
                 optim_params = list(self.netG.parameters())
 
-            self.optG = torch.optim.Adam(
-                optim_params, lr=opt['train']["optimizer"]["lr"])
+            if opt['train']["optimizer"]["type"] == "adam":
+                self.optG = torch.optim.Adam(
+                    optim_params, lr=opt['train']["optimizer"]["lr"])
+            elif opt['train']["optimizer"]["type"] == "adamw":
+                self.optG = torch.optim.AdamW(
+                    optim_params, lr=opt['train']["optimizer"]["lr"])
+            else:
+                raise NotImplementedError(
+                    'Optimizer [{:s}] not implemented'.format(opt['train']["optimizer"]["type"]))
+
             self.log_dict = OrderedDict()
         self.load_network()
         self.print_network()

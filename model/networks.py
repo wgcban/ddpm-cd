@@ -103,7 +103,7 @@ def define_G(opt):
         model,
         image_size=model_opt['diffusion']['image_size'],
         channels=model_opt['diffusion']['channels'],
-        loss_type='l1',    # L1 or L2
+        loss_type='l2',    # L1 or L2
         conditional=model_opt['diffusion']['conditional'],
         schedule_opt=model_opt['beta_schedule']['train']
     )
