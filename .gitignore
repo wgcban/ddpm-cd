@@ -1,5 +1,7 @@
 #Dataset folders
 /dataset/pavia_center/*
+/dataset/cave/*
+/dataset/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
