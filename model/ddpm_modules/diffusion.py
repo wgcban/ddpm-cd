@@ -224,6 +224,7 @@ class GaussianDiffusion(nn.Module):
                 img = self.p_sample(img, torch.full(
                     (b,), i, device=device, dtype=torch.long), condition_x=torch.cat((p,x), dim=1))
                 if i % sample_inter == 0:
+                    img = x + img
                     ret_img = torch.cat([ret_img, img], dim=0)
         if continous:
             return ret_img
@@ -277,7 +278,7 @@ class GaussianDiffusion(nn.Module):
         # )
 
     def p_losses(self, x_in, noise=None):
-        x_start = x_in['HR']
+        x_start = x_in['HR']-x_in['SR'] #Updated for residual
         [b, c, h, w] = x_start.shape
         t = torch.randint(0, self.num_timesteps, (b,),
                           device=x_start.device).long()

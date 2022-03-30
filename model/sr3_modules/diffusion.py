@@ -193,6 +193,7 @@ class GaussianDiffusion(nn.Module):
             for i in tqdm(reversed(range(0, self.num_timesteps)), desc='sampling loop time step', total=self.num_timesteps):
                 img = self.p_sample(img, i, condition_x=torch.cat((x_in['P'], x_in['SR']), dim=1))
                 if i % sample_inter == 0:
+                    img = img + x
                     ret_img = torch.cat([ret_img, img], dim=0)
         if continous:
             return ret_img
@@ -219,7 +220,7 @@ class GaussianDiffusion(nn.Module):
         )
 
     def p_losses(self, x_in, noise=None):
-        x_start = x_in['HR']
+        x_start = x_in['HR']-x_in['SR']
         [b, c, h, w] = x_start.shape
         t = np.random.randint(1, self.num_timesteps + 1)
         continuous_sqrt_alpha_cumprod = torch.FloatTensor(
