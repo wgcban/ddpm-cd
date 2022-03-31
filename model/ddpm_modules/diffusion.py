@@ -286,7 +286,8 @@ class GaussianDiffusion(nn.Module):
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
 
         if not self.conditional:
-            x_recon = self.denoise_fn(x_noisy, t)
+            x_recon = self.denoise_fn(
+                torch.cat([x_in['P'], x_in['SR'], x_noisy], dim=1), t)
         else:
             x_recon = self.denoise_fn(
                 torch.cat([x_in['P'], x_in['SR'], x_noisy], dim=1), t)
