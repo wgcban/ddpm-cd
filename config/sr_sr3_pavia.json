@@ -1,5 +1,5 @@
 {
-    "name": "pansharpening-pavia-center-dataset-SR3",
+    "name": "pansharpening-pavia-center-dataset-SR3-diff",
     "phase": "train", // train or val
     "gpu_ids": [
         0
