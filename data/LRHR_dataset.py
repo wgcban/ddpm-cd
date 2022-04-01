@@ -112,16 +112,16 @@ class LRHRDataset(Dataset):
             img_HR = scipy.io.loadmat(self.hr_path[index])['hr'].transpose(2, 0, 1)
             img_P  = np.expand_dims(scipy.io.loadmat(self.p_path[index])['p'], 0)
             img_SR = np.array(scipy.io.loadmat(self.sr_path[index])['sr'].transpose(2, 0, 1))
-            
+            img_res= img_HR-img_SR
             if self.need_LR:
                 img_LR = scipy.io.loadmat(self.lr_path[index])['lr'].transpose(2, 0, 1)
 
         if self.need_LR:
             [img_LR, img_SR, img_P, img_HR] = Util.transform_augment_hsi(
                 [img_LR, img_SR, img_P, img_HR], split=self.split, min_max=(-1, 1))
-            return {'LR': img_LR, 'HR': img_HR, 'SR': img_SR, 'P': img_P,'Index': index}
+            return {'LR': img_LR, 'HR': img_HR, 'SR': img_SR, 'P': img_P, 'RES': img_res, 'Index': index}
         else:
             [img_SR, img_P, img_HR] = Util.transform_augment_hsi(
                 [img_SR, img_P, img_HR], split=self.split, min_max=(-1, 1))
             
-            return {'HR': img_HR, 'SR': img_SR, 'P': img_P, 'Index': index}
+            return {'HR': img_HR, 'SR': img_SR, 'P': img_P, 'RES': img_res, 'Index': index}
