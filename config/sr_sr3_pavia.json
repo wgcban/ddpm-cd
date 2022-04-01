@@ -9,14 +9,14 @@
         "tb_logger": "tb_logger",
         "results": "results",
         "checkpoint": "checkpoint",
-        "resume_state": "experiments/sr_ffhq_210806_204158/checkpoint/I830000_E32"
+        "resume_state": "./../diff-large-files/experiments/sr_ffhq_210806_204158/checkpoint/I830000_E32"
         //"resume_state": "experiments/sr_ffhq_210806_204158/checkpoint/I640000_E32" //pretrain model or training state
     },
     "datasets": {
         "train": {
             "name": "pavia_40_160_train",
             "mode": "HR", // whether need LR img
-            "dataroot": "dataset/pavia_center/train",
+            "dataroot": "./../diff-large-files/dataset/pavia_center/train",
             "datatype": "mat", //lmdb or img, path of img files
             "l_resolution": 40, // low resolution need to super_resolution
             "r_resolution": 160, // high resolution
@@ -28,7 +28,7 @@
         "val": {
             "name": "pavia_40_160_val",
             "mode": "HR",
-            "dataroot": "dataset/pavia_center/val",
+            "dataroot": "./../diff-large-files/dataset/pavia_center/val",
             "datatype": "mat", //lmdb or img, path of img files
             "l_resolution": 40,
             "r_resolution": 160,
