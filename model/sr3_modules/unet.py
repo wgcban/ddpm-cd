@@ -269,10 +269,10 @@ class UNet(nn.Module):
         cond_feats = []
         for layer in self.cond_downs:
             if isinstance(layer, ResnetBlocWithAttn):
-                x = layer(cond, t)
+                cond = layer(cond, t)
             else:
-                x = layer(x)
-            cond_feats.append(x)
+                cond = layer(cond)
+            cond_feats.append(cond)
         
         # Compute the difference of features as feat
         feats = []
