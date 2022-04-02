@@ -185,13 +185,13 @@ class UNet(nn.Module):
         else:
             noise_level_channel = None
             self.noise_level_mlp = None
-
+        
+        #Downsampling for x_t
         num_mults = len(channel_mults)
         pre_channel = inner_channel
         feat_channels = [pre_channel]
         now_res = image_size
         
-        #Downsampling for x_t
         x_downs = [nn.Conv2d(in_channel, inner_channel,
                            kernel_size=3, padding=1)]
         for ind in range(num_mults):
@@ -210,6 +210,11 @@ class UNet(nn.Module):
         self.x_downs = nn.ModuleList(x_downs)
 
         #Downsampling for condition
+        num_mults = len(channel_mults)
+        pre_channel = inner_channel
+        feat_channels = [pre_channel]
+        now_res = image_size
+
         cond_downs = [nn.Conv2d(in_channel+1, inner_channel,
                            kernel_size=3, padding=1)]
         for ind in range(num_mults):
