@@ -219,11 +219,11 @@ class UNet(nn.Module):
             for _ in range(0, res_blocks):
                 cond_downs.append(ResnetBlocWithAttn(
                     pre_channel, channel_mult, noise_level_emb_dim=noise_level_channel, norm_groups=norm_groups, dropout=dropout, with_attn=use_attn))
-                feat_channels.append(channel_mult)
+                #feat_channels.append(channel_mult)
                 pre_channel = channel_mult
             if not is_last:
                 cond_downs.append(Downsample(pre_channel))
-                feat_channels.append(pre_channel)
+                #feat_channels.append(pre_channel)
                 now_res = now_res//2
         self.cond_downs = nn.ModuleList(cond_downs)
 
