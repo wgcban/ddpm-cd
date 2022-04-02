@@ -280,12 +280,14 @@ class UNet(nn.Module):
             x = x_feats[i]-cond_feats[i]
             feats.append(x)
 
+        # Sending final difference through middle layers
         for layer in self.mid:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(x, t)
             else:
                 x = layer(x)
 
+        # Getting final prediction through skip connections
         for layer in self.ups:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(torch.cat((x, feats.pop()), dim=1), t)
