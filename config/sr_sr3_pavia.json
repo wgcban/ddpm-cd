@@ -1,5 +1,5 @@
 {
-    "name": "pansharpening-pavia-center-dataset-SR3-diff",
+    "name": "pansharpening-pavia-center-dataset-SR3-feature-diff",
     "phase": "train", // train or val
     "gpu_ids": [
         0
@@ -41,9 +41,10 @@
     },
     "model": {
         "which_model_G": "sr3", // use the ddpm or sr3 network structure
+        "model_hsi": true,
         "finetune_norm": false,
         "unet": {
-            "in_channel": 205,
+            "in_channel": 102,
             "out_channel": 102,
             "inner_channel": 128,
             "channel_multiplier": [
