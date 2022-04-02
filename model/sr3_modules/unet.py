@@ -190,22 +190,42 @@ class UNet(nn.Module):
         pre_channel = inner_channel
         feat_channels = [pre_channel]
         now_res = image_size
-        downs = [nn.Conv2d(in_channel, inner_channel,
+        
+        #Downsampling for x_t
+        x_downs = [nn.Conv2d(in_channel, inner_channel,
                            kernel_size=3, padding=1)]
         for ind in range(num_mults):
             is_last = (ind == num_mults - 1)
             use_attn = (now_res in attn_res)
             channel_mult = inner_channel * channel_mults[ind]
             for _ in range(0, res_blocks):
-                downs.append(ResnetBlocWithAttn(
+                x_downs.append(ResnetBlocWithAttn(
                     pre_channel, channel_mult, noise_level_emb_dim=noise_level_channel, norm_groups=norm_groups, dropout=dropout, with_attn=use_attn))
                 feat_channels.append(channel_mult)
                 pre_channel = channel_mult
             if not is_last:
-                downs.append(Downsample(pre_channel))
+                x_downs.append(Downsample(pre_channel))
                 feat_channels.append(pre_channel)
                 now_res = now_res//2
-        self.downs = nn.ModuleList(downs)
+        self.x_downs = nn.ModuleList(x_downs)
+
+        #Downsampling for condition
+        cond_downs = [nn.Conv2d(in_channel+1, inner_channel,
+                           kernel_size=3, padding=1)]
+        for ind in range(num_mults):
+            is_last = (ind == num_mults - 1)
+            use_attn = (now_res in attn_res)
+            channel_mult = inner_channel * channel_mults[ind]
+            for _ in range(0, res_blocks):
+                cond_downs.append(ResnetBlocWithAttn(
+                    pre_channel, channel_mult, noise_level_emb_dim=noise_level_channel, norm_groups=norm_groups, dropout=dropout, with_attn=use_attn))
+                feat_channels.append(channel_mult)
+                pre_channel = channel_mult
+            if not is_last:
+                cond_downs.append(Downsample(pre_channel))
+                feat_channels.append(pre_channel)
+                now_res = now_res//2
+        self.cond_downs = nn.ModuleList(cond_downs)
 
         self.mid = nn.ModuleList([
             ResnetBlocWithAttn(pre_channel, pre_channel, noise_level_emb_dim=noise_level_channel, norm_groups=norm_groups,
@@ -232,16 +252,32 @@ class UNet(nn.Module):
 
         self.final_conv = Block(pre_channel, default(out_channel, in_channel), groups=norm_groups)
 
-    def forward(self, x, time):
+    def forward(self, x, cond, time):
         t = self.noise_level_mlp(time) if exists(
             self.noise_level_mlp) else None
 
-        feats = []
-        for layer in self.downs:
+        # Features of x_t
+        x_feats = []
+        for layer in self.x_downs:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(x, t)
             else:
                 x = layer(x)
+            x_feats.append(x)
+        
+        # Features of cond
+        cond_feats = []
+        for layer in self.cond_downs:
+            if isinstance(layer, ResnetBlocWithAttn):
+                x = layer(x, t)
+            else:
+                x = layer(x)
+            cond_feats.append(x)
+        
+        # Compute the difference of features as feat
+        feats = []
+        for i in len(x_feats):
+            x = x_feats[i]-cond_feats[i]
             feats.append(x)
 
         for layer in self.mid:
