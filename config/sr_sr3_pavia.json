@@ -41,7 +41,6 @@
     },
     "model": {
         "which_model_G": "sr3", // use the ddpm or sr3 network structure
-        "model_hsi": true,
         "finetune_norm": false,
         "unet": {
             "in_channel": 102,
@@ -77,6 +76,7 @@
         "diffusion": {
             "image_size": 160,
             "channels": 102, //sample channel
+            "model_hsi": true,
             "conditional": true // unconditional generation or unconditional generation(super_resolution)
         }
     },
