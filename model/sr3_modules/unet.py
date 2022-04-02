@@ -269,7 +269,7 @@ class UNet(nn.Module):
         cond_feats = []
         for layer in self.cond_downs:
             if isinstance(layer, ResnetBlocWithAttn):
-                x = layer(x, t)
+                x = layer(cond, t)
             else:
                 x = layer(x)
             cond_feats.append(x)
