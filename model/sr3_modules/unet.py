@@ -281,7 +281,7 @@ class UNet(nn.Module):
         
         # Compute the difference of features as feat
         feats = []
-        for i in len(x_feats):
+        for i in range(len(x_feats)):
             x = x_feats[i]-cond_feats[i]
             feats.append(x)
 
