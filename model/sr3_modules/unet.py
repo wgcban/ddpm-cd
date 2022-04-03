@@ -250,7 +250,6 @@ class UNet(nn.Module):
         #First downsampling layer
         x = self.first_down(x) + self.f_pan(pan) + self.f_hsi(hsi_sr)
 
-        #Downsampling layers
         feats = []
         for layer in self.downs:
             if isinstance(layer, ResnetBlocWithAttn):
@@ -259,14 +258,12 @@ class UNet(nn.Module):
                 x = layer(x)
             feats.append(x)
 
-        # Sending through middle layers
         for layer in self.mid:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(x, t)
             else:
                 x = layer(x)
 
-        # Getting final prediction through skip connections
         for layer in self.ups:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(torch.cat((x, feats.pop()), dim=1), t)
