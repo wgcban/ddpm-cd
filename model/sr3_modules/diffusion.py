@@ -191,7 +191,7 @@ class GaussianDiffusion(nn.Module):
             if self.model_hsi:
                 x = x_in['HR']
             else:
-                x = x_in['RES']
+                x = x_in['HR']
             shape = x.shape
             img = torch.randn(shape, device=device)
             ret_img = x
