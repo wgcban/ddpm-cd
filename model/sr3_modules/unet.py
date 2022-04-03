@@ -188,19 +188,14 @@ class UNet(nn.Module):
             noise_level_channel = None
             self.noise_level_mlp = None
 
-        # Downsampling for x_t
         num_mults = len(channel_mults)
         pre_channel = inner_channel
         feat_channels = [pre_channel]
         now_res = image_size
-
-        # Pan and HSI feature encoders
-        self.f_pan = pan_e(in_channels=1, mid_channels=32, out_channels=inner_channel)
-        self.f_hsi = hsi_e(in_channels=in_channel, mid_channels=32, out_channels=inner_channel)
-        
-        # Donsampling branch of x_t
         self.first_down = nn.Conv2d(in_channel, inner_channel,
                            kernel_size=3, padding=1)
+        self.f_pan = pan_e(in_channels=1, mid_channels=32, out_channels=inner_channel)
+        self.f_hsi = hsi_e(in_channels=in_channel, mid_channels=32, out_channels=inner_channel)
         
         downs = []
         for ind in range(num_mults):
