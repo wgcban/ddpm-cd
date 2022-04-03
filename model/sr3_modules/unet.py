@@ -199,8 +199,8 @@ class UNet(nn.Module):
         self.f_hsi = hsi_e(in_channels=in_channel, mid_channels=32, out_channels=inner_channel)
         
         # Donsampling branch of x_t
-        self.first_down = [nn.Conv2d(in_channel, inner_channel,
-                           kernel_size=3, padding=1)]
+        self.first_down = nn.Conv2d(in_channel, inner_channel,
+                           kernel_size=3, padding=1)
         
         downs = []
         for ind in range(num_mults):
