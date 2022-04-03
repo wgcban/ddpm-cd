@@ -195,7 +195,7 @@ class UNet(nn.Module):
         now_res = image_size
 
         # Pan and HSI feature encoders
-        self.f_pan = pan_e(in_channels=1,mid_channels=32, out_channels=inner_channel)
+        self.f_pan = pan_e(in_channels=1, mid_channels=32, out_channels=inner_channel)
         self.f_hsi = hsi_e(in_channels=in_channel, mid_channels=32, out_channels=inner_channel)
         
         # Donsampling branch of x_t
