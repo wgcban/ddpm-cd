@@ -3,6 +3,8 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from inspect import isfunction
+from sr3_modules.hsi_e import hsi_e
+from sr3_modules.pan_e import pan_e
 
 
 def exists(x):
@@ -186,51 +188,35 @@ class UNet(nn.Module):
             noise_level_channel = None
             self.noise_level_mlp = None
 
-        #Downsampling for condition
+        # Downsampling for x_t
         num_mults = len(channel_mults)
         pre_channel = inner_channel
         feat_channels = [pre_channel]
         now_res = image_size
 
-        cond_downs = [nn.Conv2d(in_channel+1, inner_channel,
-                           kernel_size=3, padding=1)]
-        for ind in range(num_mults):
-            is_last = (ind == num_mults - 1)
-            use_attn = (now_res in attn_res)
-            channel_mult = inner_channel * channel_mults[ind]
-            for _ in range(0, res_blocks):
-                cond_downs.append(ResnetBlocWithAttn(
-                    pre_channel, channel_mult, noise_level_emb_dim=noise_level_channel, norm_groups=norm_groups, dropout=dropout, with_attn=use_attn))
-                #feat_channels.append(channel_mult)
-                pre_channel = channel_mult
-            if not is_last:
-                cond_downs.append(Downsample(pre_channel))
-                #feat_channels.append(pre_channel)
-                now_res = now_res//2
-        self.cond_downs = nn.ModuleList(cond_downs)
-
-        #Downsampling for x_t
-        num_mults = len(channel_mults)
-        pre_channel = inner_channel
-        feat_channels = [pre_channel]
-        now_res = image_size
+        # Pan and HSI feature encoders
+        self.f_pan = pan_e(in_channels=1,mid_channels=32, out_channels=inner_channel)
+        self.f_hsi = hsi_e(in_channels=in_channel, mid_channels=32, out_channels=inner_channel)
         
-        x_downs = [nn.Conv2d(in_channel, inner_channel,
+        # Donsampling branch of x_t
+        self.first_down = [nn.Conv2d(in_channel, inner_channel,
                            kernel_size=3, padding=1)]
+        
+        downs = []
         for ind in range(num_mults):
             is_last = (ind == num_mults - 1)
             use_attn = (now_res in attn_res)
             channel_mult = inner_channel * channel_mults[ind]
             for _ in range(0, res_blocks):
-                x_downs.append(ResnetBlocWithAttn(
+                downs.append(ResnetBlocWithAttn(
                     pre_channel, channel_mult, noise_level_emb_dim=noise_level_channel, norm_groups=norm_groups, dropout=dropout, with_attn=use_attn))
                 feat_channels.append(channel_mult)
                 pre_channel = channel_mult
             if not is_last:
-                x_downs.append(Downsample(pre_channel))
+                downs.append(Downsample(pre_channel))
                 feat_channels.append(pre_channel)
                 now_res = now_res//2
-        self.x_downs = nn.ModuleList(x_downs)
+        self.downs = nn.ModuleList(downs)
 
         self.mid = nn.ModuleList([
             ResnetBlocWithAttn(pre_channel, pre_channel, noise_level_emb_dim=noise_level_channel, norm_groups=norm_groups,
@@ -257,35 +243,23 @@ class UNet(nn.Module):
 
         self.final_conv = Block(pre_channel, default(out_channel, in_channel), groups=norm_groups)
 
-    def forward(self, x, cond, time):
+    def forward(self, x, pan, hsi_sr, time):
         t = self.noise_level_mlp(time) if exists(
             self.noise_level_mlp) else None
 
-        # Features of x_t
-        x_feats = []
-        for layer in self.x_downs:
+        #First downsampling layer
+        x = self.first_down(x) + self.f_pan(pan) + self.f_hsi(hsi_sr)
+
+        #Downsampling layers
+        feats = []
+        for layer in self.downs:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(x, t)
             else:
                 x = layer(x)
-            x_feats.append(x)
-        
-        # Features of cond
-        cond_feats = []
-        for layer in self.cond_downs:
-            if isinstance(layer, ResnetBlocWithAttn):
-                cond = layer(cond, t)
-            else:
-                cond = layer(cond)
-            cond_feats.append(cond)
-        
-        # Compute the difference of features as feat
-        feats = []
-        for i in range(len(x_feats)):
-            x = x_feats[i]-cond_feats[i]
             feats.append(x)
 
-        # Sending final difference through middle layers
+        # Sending through middle layers
         for layer in self.mid:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(x, t)
