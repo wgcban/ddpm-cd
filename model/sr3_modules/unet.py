@@ -245,7 +245,7 @@ class UNet(nn.Module):
         #First downsampling layer
         x = self.first_down(x) + self.f_pan(pan) + self.f_hsi(hsi_sr)
 
-        feats = x
+        feats = [x]
         for layer in self.downs:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(x, t)
