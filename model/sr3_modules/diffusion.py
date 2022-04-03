@@ -189,7 +189,7 @@ class GaussianDiffusion(nn.Module):
                     ret_img = torch.cat([ret_img, img], dim=0)
         else:
             if self.model_hsi:
-                x = x_in['SR']
+                x = x_in['HR']
             else:
                 x = x_in['RES']
             shape = x.shape
@@ -228,7 +228,7 @@ class GaussianDiffusion(nn.Module):
 
     def p_losses(self, x_in, noise=None):
         if self.model_hsi:
-            x_start = x_in['SR']
+            x_start = x_in['HR']
         else:
             x_start = x_in['RES']
         [b, c, h, w] = x_start.shape
