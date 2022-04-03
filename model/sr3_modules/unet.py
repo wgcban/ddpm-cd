@@ -3,8 +3,8 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from inspect import isfunction
-from sr3_modules.hsi_e import hsi_e
-from sr3_modules.pan_e import pan_e
+from model.sr3_modules.hsi_e import hsi_e
+from model.sr3_modules.pan_e import pan_e
 
 
 def exists(x):
