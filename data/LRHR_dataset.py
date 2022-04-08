@@ -1,6 +1,7 @@
 from io import BytesIO
 import lmdb
 from PIL import Image
+import torch
 from torch.utils.data import Dataset
 import random
 import data.util as Util
