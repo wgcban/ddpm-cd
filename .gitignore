@@ -3,6 +3,7 @@
 /dataset/cave/*
 /dataset/*
 /chckpoints/*
+/experiments/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
