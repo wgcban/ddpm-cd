@@ -36,9 +36,9 @@
             "data_len": 50 // data length in validation 
         },  
         "RGB": {
-            "R": 60,
-            "G": 30,
-            "B": 10}
+            "R": 23,
+            "G": 13,
+            "B": 6}
     },
     "model": {
         "which_model_G": "sr3", // use the ddpm or sr3 network structure
