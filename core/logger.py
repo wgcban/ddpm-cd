@@ -35,7 +35,7 @@ def parse(args):
     if args.debug:
         opt['name'] = 'debug_{}'.format(opt['name'])
     experiments_root = os.path.join(
-        './../diff-large-files/experiments', '{}_{}'.format(opt['name'], get_timestamp()))
+        'experiments', '{}_{}'.format(opt['name'], get_timestamp()))
     opt['path']['experiments_root'] = experiments_root
     for key, path in opt['path'].items():
         if 'resume' not in key and 'experiments' not in key:
