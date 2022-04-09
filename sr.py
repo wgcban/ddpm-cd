@@ -42,6 +42,7 @@ if __name__ == "__main__":
     # Initialize WandbLogger
     if opt['enable_wandb']:
         import wandb
+        print("Initializing wandblog.")
         wandb_logger = WandbLogger(opt)
         wandb.define_metric('validation/val_step')
         wandb.define_metric('epoch')
