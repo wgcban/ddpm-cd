@@ -46,7 +46,7 @@
         "unet": {
             "in_channel": 31,
             "out_channel": 31,
-            "inner_channel": 64,
+            "inner_channel": 128,
             "channel_multiplier": [
                 1,
                 2,

@@ -195,7 +195,7 @@ class UNet(nn.Module):
 
         self.pan_hsi_e  = pan_e(in_channels=in_channel+1, mid_channels=32, out_channels=inner_channel)
         self.x_e        = hsi_e(in_channels=in_channel, mid_channels=32, out_channels=inner_channel)
-        self.mix_e      = hsi_e(in_channels=2*in_channel, mid_channels=32, out_channels=in_channel)
+        self.mix_e      = hsi_e(in_channels=2*inner_channel, mid_channels=32, out_channels=inner_channel)
         
         downs = []
         for ind in range(num_mults):
