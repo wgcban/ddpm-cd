@@ -85,9 +85,9 @@ class GaussianDiffusion(nn.Module):
 
     def set_loss(self, device):
         if self.loss_type == 'l1':
-            self.loss_func = nn.L1Loss(reduction='sum').to(device)
+            self.loss_func = nn.L1Loss(reduction='mean').to(device)
         elif self.loss_type == 'l2':
-            self.loss_func = nn.MSELoss(reduction='sum').to(device)
+            self.loss_func = nn.MSELoss(reduction='mean').to(device)
         else:
             raise NotImplementedError()
 
