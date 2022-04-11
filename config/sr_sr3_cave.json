@@ -88,7 +88,7 @@
         "save_checkpoint_freq": 1e4,
         "print_freq": 200,
         "optimizer": {
-            "type": "adamw",
+            "type": "adam",
             "lr": 1e-5
         },
         "ema_scheduler": { // not used now
