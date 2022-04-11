@@ -216,12 +216,6 @@ class GaussianDiffusion(nn.Module):
             continuous_sqrt_alpha_cumprod * x_start +
             (1 - continuous_sqrt_alpha_cumprod**2).sqrt() * noise
         )
-    
-    def get_denoised_hsi(self, x_noisy, continuous_sqrt_alpha_cumprod, noise_recon):
-        # random gama
-        return (
-            (x_noisy-(1-continuous_sqrt_alpha_cumprod**2).sqrt()*noise_recon)/continuous_sqrt_alpha_cumprod
-        )
 
     def p_losses(self, x_in, noise=None):
         if self.model_hsi:
@@ -248,12 +242,8 @@ class GaussianDiffusion(nn.Module):
             x_start=x_start, continuous_sqrt_alpha_cumprod=continuous_sqrt_alpha_cumprod.view(-1, 1, 1, 1), noise=noise)
 
         noise_recon = self.denoise_fn(x_noisy, x_in['P'], x_in['SR'], continuous_sqrt_alpha_cumprod)
-
-        #Comment out these two lines
-        x_recon = self.get_denoised_hsi(x_noisy, continuous_sqrt_alpha_cumprod.view(-1, 1, 1, 1), noise_recon)
-        loss    = self.loss_func(x_start, x_recon)
         
-        #loss = self.loss_func(noise, noise_recon)
+        loss = self.loss_func(noise, noise_recon)
         return loss
 
     def forward(self, x, *args, **kwargs):

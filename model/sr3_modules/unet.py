@@ -195,7 +195,8 @@ class UNet(nn.Module):
 
         self.pan_hsi_e  = pan_e(in_channels=in_channel+1, mid_channels=32, out_channels=inner_channel)
         self.x_e        = hsi_e(in_channels=in_channel, mid_channels=32, out_channels=inner_channel)
-        self.mix_e      = hsi_e(in_channels=2*inner_channel, mid_channels=32, out_channels=inner_channel)
+        #self.mix_e      = nn.Conv2d(in_channels=inner_channel, out_channels=inner_channel, kernel_size=3, padding=1)
+                            #hsi_e(in_channels=2*inner_channel, mid_channels=32, out_channels=inner_channel)
         
         downs = []
         for ind in range(num_mults):
@@ -245,7 +246,7 @@ class UNet(nn.Module):
         #Conditioning x_t features with pan and hsi_sr features
         f_x         = self.x_e(x)
         f_pan_hsi   = self.pan_hsi_e(torch.cat((pan, hsi_sr), dim=1))
-        x           = self.mix_e(torch.cat((f_x, f_pan_hsi), dim=1))
+        x           = f_x + f_pan_hsi
 
         feats = [x]
         for layer in self.downs:
