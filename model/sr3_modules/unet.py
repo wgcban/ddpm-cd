@@ -193,8 +193,9 @@ class UNet(nn.Module):
         feat_channels = [pre_channel]
         now_res = image_size
 
-        self.pan_hsi_e  = pan_e(in_channels=in_channel+1, mid_channels=32, out_channels=inner_channel)
-        self.x_e        = hsi_e(in_channels=in_channel, mid_channels=32, out_channels=inner_channel)
+        self.init_conv   = nn.Conv2d(in_channels=2*in_channel+1, out_channels=inner_channel, kernel_size=3, padding=1)
+        #self.pan_hsi_e  = pan_e(in_channels=in_channel+1, mid_channels=32, out_channels=inner_channel)
+        #self.x_e        = hsi_e(in_channels=in_channel, mid_channels=32, out_channels=inner_channel)
         #self.mix_e      = nn.Conv2d(in_channels=inner_channel, out_channels=inner_channel, kernel_size=3, padding=1)
                             #hsi_e(in_channels=2*inner_channel, mid_channels=32, out_channels=inner_channel)
         
@@ -243,10 +244,7 @@ class UNet(nn.Module):
         t = self.noise_level_mlp(time) if exists(
             self.noise_level_mlp) else None
 
-        #Conditioning x_t features with pan and hsi_sr features
-        f_x         = self.x_e(x)
-        f_pan_hsi   = self.pan_hsi_e(torch.cat((pan, hsi_sr), dim=1))
-        x           = f_x + f_pan_hsi
+        x   = self.init_conv(torch.cat((x, pan, hsi_sr), dim=1))
 
         feats = [x]
         for layer in self.downs:

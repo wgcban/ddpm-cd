@@ -46,7 +46,7 @@
         "unet": {
             "in_channel": 31,
             "out_channel": 31,
-            "inner_channel": 64,
+            "inner_channel": 128,
             "channel_multiplier": [
                 1,
                 2,
@@ -89,8 +89,8 @@
         "save_checkpoint_freq": 1e4,
         "print_freq": 200,
         "optimizer": {
-            "type": "adamw", //adam
-            "lr": 1e-4 //1e-5
+            "type": "adam", //adam
+            "lr": 1e-5 //1e-5
         },
         "ema_scheduler": { // not used now
             "step_start_ema": 5000,
