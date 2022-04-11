@@ -46,19 +46,20 @@
         "unet": {
             "in_channel": 31,
             "out_channel": 31,
-            "inner_channel": 128,
+            "inner_channel": 64,
             "channel_multiplier": [
                 1,
                 2,
                 4,
-                8,
-                8
-            ],
-            "attn_res": [
+                //8,
+                //8
                 16
             ],
-            "res_blocks": 2,
-            "dropout": 0.2
+            "attn_res": [
+                //16
+            ],
+            "res_blocks": 1, //2
+            "dropout": 0 //0.2
         },
         "beta_schedule": { // use munual beta_schedule for acceleration
             "train": {
@@ -71,7 +72,7 @@
                 "schedule": "linear",
                 "n_timestep": 2000,
                 "linear_start": 1e-6,
-                "linear_end": 1e-2
+                "linear_end": 1e-3 //1e-2
             }
         },
         "diffusion": {
