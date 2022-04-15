@@ -162,17 +162,18 @@ class DDPM(BaseModel):
             network = self.netG
             if isinstance(self.netG, nn.DataParallel):
                 network = network.module
-            # network.load_state_dict(torch.load(
-            #     gen_path), strict=(not self.opt['model']['finetune_norm']))
+            
+            if self.opt['phase'] == 'train':
+                # Allowing to load model weights from even different model
+                current_model_dict = network.state_dict()
+                loaded_state_dict = torch.load(gen_path)
+                new_state_dict={k:v if v.size()==current_model_dict[k].size()  else  current_model_dict[k] for k,v in zip(current_model_dict.keys(), loaded_state_dict.values())}
+                network.load_state_dict(new_state_dict, strict=False)
+            else:
+                #Loading the model for inference or validation
+                network.load_state_dict(torch.load(
+                    gen_path), strict=(not self.opt['model']['finetune_norm']))
 
-            #When sizes are different
-            current_model_dict = network.state_dict()
-            loaded_state_dict = torch.load(gen_path)
-            new_state_dict={k:v if v.size()==current_model_dict[k].size()  else  current_model_dict[k] for k,v in zip(current_model_dict.keys(), loaded_state_dict.values())}
-            network.load_state_dict(new_state_dict, strict=False)
-
-            # network.load_state_dict(torch.load(
-            #     gen_path), strict=False)
             #if self.opt['phase'] == 'train':
                 # optimizer
                 # opt = torch.load(opt_path)

@@ -189,21 +189,22 @@ if __name__ == "__main__":
             diffusion.test(continous=True)
             visuals = diffusion.get_current_visuals()
 
-            hr_img = Metrics.tensor2img(visuals['HR'])  # uint8
-            lr_img = Metrics.tensor2img(visuals['LR'])  # uint8
-            fake_img = Metrics.tensor2img(visuals['INF'])  # uint8
+            #Getting the RGB image from Hyperspectral Image
+            hr_img = Metrics.tensor2img(visuals['HR'][0, (R, G, B), :, :])  # uint8
+            lr_img = Metrics.tensor2img(visuals['LR'][0, (R, G, B), :, :])  # uint8
+            fake_img = Metrics.tensor2img(visuals['INF'][0, (R, G, B), :, :])  # uint8
 
             sr_img_mode = 'grid'
             if sr_img_mode == 'single':
                 # single img series
-                sr_img = visuals['SR']  # uint8
+                sr_img = Metrics.tensor2img(visuals['SR'][(R, G, B), :, :])  # uint8
                 sample_num = sr_img.shape[0]
                 for iter in range(0, sample_num):
                     Metrics.save_img(
                         Metrics.tensor2img(sr_img[iter]), '{}/{}_{}_sr_{}.png'.format(result_path, current_step, idx, iter))
             else:
                 # grid img
-                sr_img = Metrics.tensor2img(visuals['SR'])  # uint8
+                sr_img = Metrics.tensor2img(visuals['SR'][(R, G, B), :, :])  # uint8
                 Metrics.save_img(
                     sr_img, '{}/{}_{}_sr_process.png'.format(result_path, current_step, idx))
                 Metrics.save_img(
