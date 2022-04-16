@@ -11,7 +11,6 @@
         "checkpoint": "checkpoint",
         "resume_state": null
         //"resume_state": "/media/lidan/ssd2/diff-large-files/experiments/pansharpening-CAVE-SR3-feature-diff_220408_124420/checkpoint/I70000_E4667"
-        //"resume_state": "experiments/sr_ffhq_210806_204158/checkpoint/I640000_E32" //pretrain model or training state
     },
     "datasets": {
         "train": {
