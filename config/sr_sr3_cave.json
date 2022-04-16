@@ -1,5 +1,5 @@
 {
-    "name": "pansharpening-CAVE-SR3-feature-diff",
+    "name": "pansharpening-CAVE-Server",
     "phase": "train", // train or val
     "gpu_ids": [
         0
