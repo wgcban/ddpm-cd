@@ -178,7 +178,7 @@ class GaussianDiffusion(nn.Module):
         sample_inter = (1 | (self.num_timesteps//10))
             
         if self.model_hsi:
-            x = x_in['HR']
+            x = x_in['SR']
         else:
             x = x_in['RES']
         
