@@ -1,5 +1,5 @@
 {
-    "name": "pansharpening-CAVE-Server",
+    "name": "pansharpening-cave-server",
     "phase": "train", // train or val
     "gpu_ids": [
         0
