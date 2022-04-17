@@ -207,7 +207,7 @@ if __name__ == "__main__":
                 Metrics.save_img(
                     sr_img, '{}/{}_{}_sr_process.png'.format(result_path, current_step, idx))
                 Metrics.save_img(
-                    Metrics.tensor2img(visuals['SR'][-1]), '{}/{}_{}_sr.png'.format(result_path, current_step, idx))
+                    Metrics.tensor2img(visuals['SR'][-1, (R, G, B), :, :]), '{}/{}_{}_sr.png'.format(result_path, current_step, idx))
 
             Metrics.save_img(
                 hr_img, '{}/{}_{}_hr.png'.format(result_path, current_step, idx))

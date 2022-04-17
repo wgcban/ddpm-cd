@@ -2,7 +2,7 @@
     "name": "pansharpening-cave-server",
     "phase": "train", // train or val
     "gpu_ids": [
-        0
+        2
     ],
     "path": { //set the path
         "log": "logs",
@@ -10,7 +10,7 @@
         "results": "results",
         "checkpoint": "checkpoint",
         "resume_state": null
-        //"resume_state": "/media/lidan/ssd2/diff-large-files/experiments/pansharpening-CAVE-SR3-feature-diff_220408_124420/checkpoint/I70000_E4667"
+        //"resume_state": "experiments/pansharpening-CAVE-SR3-feature-diff_220416_034738/checkpoint/I10000_E667"
     },
     "datasets": {
         "train": {
@@ -50,24 +50,25 @@
                 1,
                 2,
                 4,
-                8,
-                8
-            ],
-            "attn_res": [
+                //8,
+                //8
                 16
             ],
-            "res_blocks": 2,
+            "attn_res": [
+                //16
+            ],
+            "res_blocks": 1, //2,
             "dropout": 0.0
         },
         "beta_schedule": { // use munual beta_schedule for acceleration
             "train": {
-                "schedule": "linear",
+                "schedule": "quad",
                 "n_timestep": 2000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2
             },
             "val": {
-                "schedule": "linear",
+                "schedule": "quad",
                 "n_timestep": 2000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2

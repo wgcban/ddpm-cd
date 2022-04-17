@@ -193,8 +193,9 @@ class UNet(nn.Module):
         feat_channels = [pre_channel]
         now_res = image_size
 
-        self.pan_hsi_e      = hsi_e(in_channels=in_channel+1, mid_channels=64, out_channels=inner_channel)
-        self.x_e            = hsi_e(in_channels=in_channel, mid_channels=64, out_channels=inner_channel)
+        self.init_conv      = nn.Conv2d(in_channels=2*in_channel+1, out_channels=inner_channel, kernel_size=3, padding=1)
+        # self.pan_hsi_e      = hsi_e(in_channels=in_channel+1, mid_channels=64, out_channels=inner_channel)
+        # self.x_e            = hsi_e(in_channels=in_channel, mid_channels=64, out_channels=inner_channel)
         
         downs = []
         for ind in range(num_mults):
@@ -242,9 +243,7 @@ class UNet(nn.Module):
             self.noise_level_mlp) else None
 
         #First downsampling layer
-        f_pan_hsi   = self.pan_hsi_e(torch.cat((pan,hsi_sr), dim=1))
-        f_x         = self.x_e(x)
-        x           = f_pan_hsi + f_x
+        x           = self.init_conv(torch.cat((x, pan, hsi_sr), dim=1))
 
         feats = [x]
         for layer in self.downs:
