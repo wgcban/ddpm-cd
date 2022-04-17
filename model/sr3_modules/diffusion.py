@@ -177,14 +177,11 @@ class GaussianDiffusion(nn.Module):
         device = self.betas.device
         sample_inter = (1 | (self.num_timesteps//10))
             
-        if self.model_hsi:
-            x = x_in['HR']
-        else:
-            x = x_in['RES']
+        x = x_in['SR']
         
         shape = x.shape
         img = x #torch.randn(shape, device=device)
-        ret_img = x
+        ret_img = img
         
         for i in tqdm(reversed(range(0, self.num_timesteps)), desc='sampling loop time step', total=self.num_timesteps):
             img = self.p_sample(img, x_in['P'], x_in['SR'], i)

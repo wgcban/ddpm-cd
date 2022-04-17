@@ -2,14 +2,14 @@
     "name": "pansharpening-CAVE-SR3-feature-diff",
     "phase": "val", // train or val
     "gpu_ids": [
-        0
+        1
     ],
     "path": { //set the path
         "log": "logs",
         "tb_logger": "tb_logger",
         "results": "val_results",
         "checkpoint": "checkpoint",
-        "resume_state": "/media/lidan/ssd2/diff-large-files/experiments/pansharpening-CAVE-SR3-feature-diff_220409_110725/checkpoint/I120000_E8000"    },
+        "resume_state": "/media/lidan/ssd2/diff-large-files/experiments/pansharpening-CAVE-SR3-feature-diff_220411_170237/checkpoint/I180000_E12000"},
     "datasets": {
         "train": {
             "name": "cave_64_256_train",
@@ -66,10 +66,10 @@
                 "linear_end": 1e-2
             },
             "val": {
-                "schedule": "linear",
-                "n_timestep": 2000,
+                "schedule": "quad",
+                "n_timestep": 200,
                 "linear_start": 1e-6,
-                "linear_end": 1e-3 //1e-2
+                "linear_end": 1e-2 //1e-2
             }
         },
         "diffusion": {
