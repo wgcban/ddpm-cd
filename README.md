@@ -45,7 +45,7 @@ There are some implement details with paper description, which maybe different w
 ## Usage
 ### Environment
 ```python
-pip install -r requirement.txt
+pip3 install -r requirement.txt
 ```
 
 ### Pretrained Model
