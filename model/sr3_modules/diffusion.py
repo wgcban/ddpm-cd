@@ -172,22 +172,21 @@ class GaussianDiffusion(nn.Module):
         return model_mean + noise * (0.5 * model_log_variance).exp()
 
     @torch.no_grad()
-    def p_sample_loop(self, x_in=None, continous=False):
+    def p_sample_loop(self, in_channels, img_size, continous=False):
         device = self.betas.device
         sample_inter = (1 | (self.num_timesteps//10))
-        
-        if x_in is not None:
-            x = x_in['img']
-            shape = x.shape
-            img   = torch.randn(shape, device=device)
+
+        if not self.conditional:
+            img = torch.randn((1, in_channels, img_size, img_size), device=device)
+            ret_img = img
+            for i in tqdm(reversed(range(0, self.num_timesteps)), desc='sampling loop time step', total=self.num_timesteps):
+                img = self.p_sample(img, torch.full(
+                    (1,), i, device=device, dtype=torch.long))
+                if i % sample_inter == 0:
+                    ret_img = torch.cat([ret_img, img], dim=0)
+            return img
         else:
-            img   = torch.randn((1, self.channels, self.image_size, self.image_size), device=device) 
-        
-        ret_img = x
-        for i in tqdm(reversed(range(0, self.num_timesteps)), desc='sampling loop time step', total=self.num_timesteps):
-            img = self.p_sample(img, i)
-            if i % sample_inter == 0:
-                ret_img = torch.cat([ret_img, img], dim=0)
+            print('Conditional sampling not supported.')
         if continous:
             return ret_img
         else:
@@ -200,8 +199,8 @@ class GaussianDiffusion(nn.Module):
         return self.p_sample_loop((batch_size, channels, image_size, image_size), continous)
 
     @torch.no_grad()
-    def super_resolution(self, x_in, continous=False):
-        return self.p_sample_loop(x_in, continous)
+    def sampling_imgs(self, in_channels, img_size, continous=False):
+        return self.p_sample_loop(in_channels, img_size, continous)
 
     def q_sample(self, x_start, continuous_sqrt_alpha_cumprod, noise=None):
         noise = default(noise, lambda: torch.randn_like(x_start))
