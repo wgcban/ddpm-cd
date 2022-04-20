@@ -12,14 +12,14 @@ import numpy as np
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', type=str, default='config/sr_sr3_cave.json',
+    parser.add_argument('-c', '--config', type=str, default='config/ddpm_train.json',
                         help='JSON file for configuration')
     parser.add_argument('-p', '--phase', type=str, choices=['train', 'val'],
                         help='Run either train(training) or val(generation)', default='train')
     parser.add_argument('-gpu', '--gpu_ids', type=str, default=None)
     parser.add_argument('-debug', '-d', action='store_true')
     parser.add_argument('-enable_wandb', action='store_true')
-    parser.add_argument('-log_wandb_ckpt', action='store_true')
+    parser.add_argument('-log_wandb_ckpt', action='store_false')
     parser.add_argument('-log_eval', action='store_true')
 
     # parse configs
@@ -54,16 +54,15 @@ if __name__ == "__main__":
     # dataset
     for phase, dataset_opt in opt['datasets'].items():
         if phase == 'train' and args.phase != 'val':
+            print("Creating train dataloader.")
             train_set   = Data.create_dataset(dataset_opt, phase)
             train_loader= Data.create_dataloader(
                 train_set, dataset_opt, phase)
         elif phase == 'val':
-            val_set = Data.create_dataset(dataset_opt, phase)
-            val_loader = Data.create_dataloader(
-                val_set, dataset_opt, phase)
-    R = opt['datasets']["RGB"]["R"]
-    G = opt['datasets']["RGB"]["G"]
-    B = opt['datasets']["RGB"]["B"]
+            print("Unconditional Sampling. No validation dataloader required.")
+            # val_set = Data.create_dataset(dataset_opt, phase)
+            # val_loader = Data.create_dataloader(
+            #     val_set, dataset_opt, phase)
     logger.info('Initial Dataset Finished')
 
     # model

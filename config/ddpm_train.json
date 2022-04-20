@@ -1,8 +1,8 @@
 {
-    "name": "pansharpening-pavia-server",
+    "name": "ddpm-train-remote-sensing",
     "phase": "train", // train or val
     "gpu_ids": [
-        3
+        8, 9
     ],
     "path": { //set the path
         "log": "logs",
@@ -10,77 +10,59 @@
         "results": "results",
         "checkpoint": "checkpoint",
         "resume_state": null
-        //"resume_state": "./../diff-large-files/experiments/sr_ffhq_210806_204158/checkpoint/I830000_E32"
-        //"resume_state": "experiments/sr_ffhq_210806_204158/checkpoint/I640000_E32" //pretrain model or training state
+        //"resume_state": "experiments/pansharpening-CAVE-SR3-feature-diff_220416_034738/checkpoint/I10000_E667"
     },
     "datasets": {
         "train": {
-            "name": "pavia_40_160_train",
-            "mode": "HR", // whether need LR img
-            "dataroot": "dataset/pavia_center/train",
-            "datatype": "mat", //lmdb or img, path of img files
-            "l_resolution": 40, // low resolution need to super_resolution
-            "r_resolution": 160, // high resolution
+            "name": "LEVIR-CD-256",
+            "dataroot": "dataset/LEVIR-CD-256/AB",
+            "datatype": "img", //lmdb or img, path of img files
+            "resolution": 256, // high resolution
             "batch_size": 8,
             "num_workers": 2,
             "use_shuffle": true,
             "data_len": -1 // -1 represents all data used in train
-        },
-        "val": {
-            "name": "pavia_40_160_val",
-            "mode": "HR",
-            "dataroot": "dataset/pavia_center/val",
-            "datatype": "mat", //lmdb or img, path of img files
-            "l_resolution": 40,
-            "r_resolution": 160,
-            "data_len": 50 // data length in validation 
-        },  
-        "RGB": {
-            "R": 60,
-            "G": 30,
-            "B": 10}
+        }
     },
     "model": {
         "which_model_G": "sr3", // use the ddpm or sr3 network structure
         "finetune_norm": false,
         "unet": {
-            "in_channel": 102,
-            "out_channel": 102,
-            "inner_channel": 128,
+            "in_channel": 3,
+            "out_channel": 3,
+            "inner_channel": 64,
             "channel_multiplier": [
                 1,
                 2,
                 4,
-                //8,
-                //8
-                16
+                8,
+                8
             ],
             "attn_res": [
-                //16
+                16
             ],
-            "res_blocks": 1,
-            "dropout": 0.0
+            "res_blocks": 2,
+            "dropout": 0.2
         },
         "beta_schedule": { // use munual beta_schedule for acceleration
             "train": {
-                "schedule": "quad",
+                "schedule": "linear",
                 "n_timestep": 2000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2
             },
             "val": {
-                "schedule": "quad",
+                "schedule": "linear",
                 "n_timestep": 2000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2
             }
         },
         "diffusion": {
-            "image_size": 160,
-            "channels": 102, //sample channel
+            "image_size": 256,
+            "channels": 3, //sample channel
             "loss": "l2", //options "l1" or "l2"
-            "model_hsi": true,
-            "conditional": true // unconditional generation or unconditional generation(super_resolution)
+            "conditional": false // unconditional generation or unconditional generation(super_resolution)
         }
     },
     "train": {
@@ -99,6 +81,6 @@
         }
     },
     "wandb": {
-        "project": "sr_pavia_server"
+        "project": "ddpm-unet-remote-sensing"
     }
 }
