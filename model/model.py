@@ -65,24 +65,24 @@ class DDPM(BaseModel):
         # set log
         self.log_dict['l_pix'] = l_pix.item()
 
-    def test(self, continous=False):
+    def test(self, in_channels, img_size, continous=False):
         self.netG.eval()
         with torch.no_grad():
             if isinstance(self.netG, nn.DataParallel):
-                self.SR = self.netG.module.super_resolution(
-                    self.data, continous)
+                self.sampled_img = self.netG.module.sampling_imgs(
+                    in_channels, img_size, continous)
             else:
-                self.SR = self.netG.super_resolution(
-                    self.data, continous)
+                self.sampled_img = self.netG.sampling_imgs(
+                    in_channels, img_size, continous)
         self.netG.train()
 
     def sample(self, batch_size=1, continous=False):
         self.netG.eval()
         with torch.no_grad():
             if isinstance(self.netG, nn.DataParallel):
-                self.SR = self.netG.module.sample(batch_size, continous)
+                self.sampled_img = self.netG.module.sample(batch_size, continous)
             else:
-                self.SR = self.netG.sample(batch_size, continous)
+                self.sampled_img = self.netG.sample(batch_size, continous)
         self.netG.train()
 
     def set_loss(self):
@@ -103,18 +103,9 @@ class DDPM(BaseModel):
     def get_current_log(self):
         return self.log_dict
 
-    def get_current_visuals(self, need_LR=True, sample=False):
+    def get_current_visuals(self):
         out_dict = OrderedDict()
-        if sample:
-            out_dict['SAM'] = self.SR.detach().float().cpu()
-        else:
-            out_dict['SR'] = self.SR.detach().float().cpu()
-            out_dict['INF'] = self.data['SR'].detach().float().cpu()
-            out_dict['HR'] = self.data['HR'].detach().float().cpu()
-            if need_LR and 'LR' in self.data:
-                out_dict['LR'] = self.data['LR'].detach().float().cpu()
-            else:
-                out_dict['LR'] = out_dict['INF']
+        out_dict['SAM'] = self.sampled_img.detach().float().cpu()
         return out_dict
 
     def print_network(self):

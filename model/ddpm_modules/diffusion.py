@@ -198,33 +198,21 @@ class GaussianDiffusion(nn.Module):
         return model_mean + nonzero_mask * (0.5 * model_log_variance).exp() * noise
 
     @torch.no_grad()
-    def p_sample_loop(self, x_in, continous=False):
+    def p_sample_loop(self, in_channels, img_size, continous=False):
         device = self.betas.device
         sample_inter = (1 | (self.num_timesteps//10))
 
         if not self.conditional:
-            shape = x_in['RES']
-            b = shape[0]
-            img = torch.randn(shape, device=device)
+            img = torch.randn((1, in_channels, img_size, img_size), device=device)
             ret_img = img
             for i in tqdm(reversed(range(0, self.num_timesteps)), desc='sampling loop time step', total=self.num_timesteps):
                 img = self.p_sample(img, torch.full(
-                    (b,), i, device=device, dtype=torch.long))
+                    (1,), i, device=device, dtype=torch.long))
                 if i % sample_inter == 0:
-                    ret_img = torch.cat([ret_img, img+x_in['SR']], dim=0)
+                    ret_img = torch.cat([ret_img, img], dim=0)
             return img
         else:
-            x = x_in['RES']
-            p = x_in['P']
-            shape = x.shape
-            b = shape[0]
-            img = torch.randn(shape, device=device)
-            ret_img = x
-            for i in tqdm(reversed(range(0, self.num_timesteps)), desc='sampling loop time step', total=self.num_timesteps):
-                img = self.p_sample(img, torch.full(
-                    (b,), i, device=device, dtype=torch.long), condition_x=torch.cat((p,x), dim=1))
-                if i % sample_inter == 0:
-                    ret_img = torch.cat([ret_img, img+x_in['SR']], dim=0)
+            print('Conditional sampling not supported.')
         if continous:
             return ret_img
         else:
@@ -237,8 +225,8 @@ class GaussianDiffusion(nn.Module):
         return self.p_sample_loop((batch_size, channels, image_size, image_size), continous)
 
     @torch.no_grad()
-    def super_resolution(self, x_in, continous=False):
-        return self.p_sample_loop(x_in, continous)
+    def sampling_imgs(self, in_channels, img_size, continous=False):
+        return self.p_sample_loop(in_channels, img_size, continous)
 
     @torch.no_grad()
     def interpolate(self, x1, x2, t=None, lam=0.5):

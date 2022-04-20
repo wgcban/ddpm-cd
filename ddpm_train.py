@@ -104,60 +104,41 @@ if __name__ == "__main__":
 
                 # validation
                 if current_step % opt['train']['val_freq'] == 0:
-                    avg_psnr = 0.0
                     result_path = '{}/{}'.format(opt['path']
                                                  ['results'], current_epoch)
                     os.makedirs(result_path, exist_ok=True)
 
                     diffusion.set_new_noise_schedule(
                         opt['model']['beta_schedule']['val'], schedule_phase='val')
-                    for idx in range(opt['val'][n_samples]):
-                        diffusion.test(continous=True)
+                    for idx in range(opt['datasets']['val']['data_len']):
+                        diffusion.test(in_channels=opt['model']['unet']['in_channel'], img_size=opt['datasets']['val']['resolution'], continous=False)
                         visuals = diffusion.get_current_visuals()
-                        sr_img = Metrics.tensor2img(visuals['SR'][(R, G, B), :, :])  # uint8
-                        hr_img = Metrics.tensor2img(visuals['HR'][0, (R, G, B), :, :])  # uint8
-                        lr_img = Metrics.tensor2img(visuals['LR'][0, (R, G, B), :, :])  # uint8
-                        fake_img = Metrics.tensor2img(visuals['INF'][0, (R, G, B), :, :])  # uint8
+
+                        sam_img = Metrics.tensor2img(visuals['SAM'])  # uint8
 
                         # generation
                         Metrics.save_img(
-                            hr_img, '{}/{}_{}_hr.png'.format(result_path, current_step, idx))
-                        Metrics.save_img(
-                            sr_img, '{}/{}_{}_sr.png'.format(result_path, current_step, idx))
-                        Metrics.save_img(
-                            lr_img, '{}/{}_{}_lr.png'.format(result_path, current_step, idx))
-                        Metrics.save_img(
-                            fake_img, '{}/{}_{}_inf.png'.format(result_path, current_step, idx))
+                            sam_img, '{}/sample_{}_{}.png'.format(result_path, current_step, idx))
+                        
                         tb_logger.add_image(
                             'Iter_{}'.format(current_step),
-                            np.transpose(np.concatenate(
-                                (fake_img, sr_img, hr_img), axis=1), [2, 0, 1]),
+                            np.transpose(sam_img, [2, 0, 1]),
                             idx)
-                        avg_psnr += Metrics.calculate_psnr(
-                            sr_img, hr_img)
 
                         if wandb_logger:
                             wandb_logger.log_image(
                                 f'validation_{idx}', 
-                                np.concatenate((fake_img, sr_img, hr_img), axis=1)
+                                np.concatenate(sam_img)
                             )
 
-                    avg_psnr = avg_psnr / idx
                     diffusion.set_new_noise_schedule(
                         opt['model']['beta_schedule']['train'], schedule_phase='train')
                     # log
-                    logger.info('# Validation # PSNR: {:.4e}'.format(avg_psnr))
                     logger_val = logging.getLogger('val')  # validation logger
-                    logger_val.info('<epoch:{:3d}, iter:{:8,d}> psnr: {:.4e}'.format(
-                        current_epoch, current_step, avg_psnr))
-                    # tensorboard logger
-                    tb_logger.add_scalar('psnr', avg_psnr, current_step)
+                    logger_val.info('<epoch:{:3d}, iter:{:8,d}> Sample generation completed.'.format(
+                        current_epoch, current_step))
 
                     if wandb_logger:
-                        wandb_logger.log_metrics({
-                            'validation/val_psnr': avg_psnr,
-                            'validation/val_step': val_step
-                        })
                         val_step += 1
 
                 if current_step % opt['train']['save_checkpoint_freq'] == 0:
@@ -174,68 +155,36 @@ if __name__ == "__main__":
         logger.info('End of training.')
     else:
         logger.info('Begin Model Evaluation.')
-        avg_psnr = 0.0
-        avg_ssim = 0.0
         idx = 0
         result_path = '{}'.format(opt['path']['results'])
         os.makedirs(result_path, exist_ok=True)
-        for _,  val_data in enumerate(val_loader):
-            idx += 1
-            diffusion.feed_data(val_data)
-            diffusion.test(continous=True)
+        for idx in range(opt['datasets']['val']['data_len']):
+            diffusion.test(in_channels=opt['model']['unet']['in_channel'], img_size=opt['datasets']['val']['resolution'], continous=True)
             visuals = diffusion.get_current_visuals()
 
-            hr_img = Metrics.tensor2img(visuals['HR'][0, (R, G, B), :, :])  # uint8
-            lr_img = Metrics.tensor2img(visuals['LR'][0, (R, G, B), :, :])  # uint8
-            fake_img = Metrics.tensor2img(visuals['INF'][0, (R, G, B), :, :])  # uint8
-
-            sr_img_mode = 'grid'
-            if sr_img_mode == 'single':
+            img_mode = 'grid'
+            if img_mode == 'single':
                 # single img series
-                sr_img = visuals['SR'][:, (R, G, B), :, :]  # uint8
-                sample_num = sr_img.shape[0]
+                sam_img = visuals['SAM']
+                sample_num = sam_img.shape[0]
                 for iter in range(0, sample_num):
                     Metrics.save_img(
-                        Metrics.tensor2img(sr_img[iter]), '{}/{}_{}_sr_{}.png'.format(result_path, current_step, idx, iter))
+                        Metrics.tensor2img(sam_img[iter]), '{}/{}_{}_sr_{}.png'.format(result_path, current_step, idx, iter))
             else:
                 # grid img
-                sr_img = Metrics.tensor2img(visuals['SR'][:, (R, G, B), :, :])  # uint8
+                sam_img = Metrics.tensor2img(visuals['SAM'])  # uint8
                 Metrics.save_img(
-                    sr_img, '{}/{}_{}_sr_process.png'.format(result_path, current_step, idx))
+                    sam_img, '{}/sampling_process_{}_{}.png'.format(result_path, current_step, idx))
                 Metrics.save_img(
-                    Metrics.tensor2img(visuals['SR'][-1, (R, G, B), :, :]), '{}/{}_{}_sr.png'.format(result_path, current_step, idx))
-
-            Metrics.save_img(
-                hr_img, '{}/{}_{}_hr.png'.format(result_path, current_step, idx))
-            Metrics.save_img(
-                lr_img, '{}/{}_{}_lr.png'.format(result_path, current_step, idx))
-            Metrics.save_img(
-                fake_img, '{}/{}_{}_inf.png'.format(result_path, current_step, idx))
-
-            # generation
-            eval_psnr = Metrics.calculate_psnr(Metrics.tensor2img(visuals['SR'][-1, (R, G, B), :, :]), hr_img)
-            eval_ssim = Metrics.calculate_ssim(Metrics.tensor2img(visuals['SR'][-1, (R, G, B), :, :]), hr_img)
-
-            avg_psnr += eval_psnr
-            avg_ssim += eval_ssim
+                    Metrics.tensor2img(visuals['SAM'][-1]), '{}/sample_{}_{}.png'.format(result_path, current_step, idx))
 
             if wandb_logger and opt['log_eval']:
-                wandb_logger.log_eval_data(fake_img, Metrics.tensor2img(visuals['SR'][-1, (R, G, B), :, :]), hr_img, eval_psnr, eval_ssim)
+                wandb_logger.log_eval_data(sam=Metrics.tensor2img(visuals['SAM'][-1]))
 
-        avg_psnr = avg_psnr / idx
-        avg_ssim = avg_ssim / idx
-
-        # log
-        logger.info('# Validation # PSNR: {:.4e}'.format(avg_psnr))
-        logger.info('# Validation # SSIM: {:.4e}'.format(avg_ssim))
         logger_val = logging.getLogger('val')  # validation logger
-        logger_val.info('<epoch:{:3d}, iter:{:8,d}> psnr: {:.4e}, ssim：{:.4e}'.format(
-            current_epoch, current_step, avg_psnr, avg_ssim))
+        logger_val.info('<epoch:{:3d}, iter:{:8,d}> Sample generation completed.'.format(
+            current_epoch, current_step))
 
         if wandb_logger:
             if opt['log_eval']:
                 wandb_logger.log_eval_table()
-            wandb_logger.log_metrics({
-                'PSNR': float(avg_psnr),
-                'SSIM': float(avg_ssim)
-            })

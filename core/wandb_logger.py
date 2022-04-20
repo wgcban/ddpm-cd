@@ -87,23 +87,19 @@ class WandbLogger:
         model_artifact.add_file(opt_path)
         self._wandb.log_artifact(model_artifact, aliases=["latest"])
 
-    def log_eval_data(self, fake_img, sr_img, hr_img, psnr=None, ssim=None):
+    def log_eval_data(self, sam, psnr=None, ssim=None):
         """
         Add data row-wise to the initialized table.
         """
         if psnr is not None and ssim is not None:
             self.eval_table.add_data(
-                self._wandb.Image(fake_img),
-                self._wandb.Image(sr_img),
-                self._wandb.Image(hr_img),
+                sam,
                 psnr,
                 ssim
             )
         else:
             self.infer_table.add_data(
-                self._wandb.Image(fake_img),
-                self._wandb.Image(sr_img),
-                self._wandb.Image(hr_img)
+                self._wandb.Image(sam)
             )
 
     def log_eval_table(self, commit=False):
