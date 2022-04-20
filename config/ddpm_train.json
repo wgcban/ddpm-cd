@@ -21,6 +21,11 @@
             "num_workers": 2,
             "use_shuffle": true,
             "data_len": -1 // -1 represents all data used in train
+        },
+        "val": {
+            "name": "LEVIR-CD-256",
+            "resolution": 256,
+            "data_len": 3
         }
     },
     "model": {
