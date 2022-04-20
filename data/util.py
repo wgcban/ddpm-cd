@@ -88,7 +88,8 @@ def transform2tensor(img, min_max=(0, 1)):
 # implementation by torchvision, detail in https://github.com/Janspiry/Image-Super-Resolution-via-Iterative-Refinement/issues/14
 totensor = torchvision.transforms.ToTensor()
 hflip = torchvision.transforms.RandomHorizontalFlip()
-def transform_augment(img, split='val', min_max=(0, 1)):    
+
+def transform_augment(img, split='val', min_max=(0, 1)):
     img = totensor(img)
     if split == 'train':
         img = hflip(img)
