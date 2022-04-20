@@ -110,7 +110,8 @@ if __name__ == "__main__":
 
                     diffusion.set_new_noise_schedule(
                         opt['model']['beta_schedule']['val'], schedule_phase='val')
-                    for idx in range(opt['datasets']['val']['data_len']):
+                    for idx in range(0, opt['datasets']['val']['data_len'], 1):
+                        print(idx)
                         diffusion.test(in_channels=opt['model']['unet']['in_channel'], img_size=opt['datasets']['val']['resolution'], continous=False)
                         visuals = diffusion.get_current_visuals()
 
