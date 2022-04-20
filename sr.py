@@ -12,7 +12,7 @@ import numpy as np
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', type=str, default='config/sr_pavia.json',
+    parser.add_argument('-c', '--config', type=str, default='config/sr_sr3_cave.json',
                         help='JSON file for configuration')
     parser.add_argument('-p', '--phase', type=str, choices=['train', 'val'],
                         help='Run either train(training) or val(generation)', default='train')
@@ -42,6 +42,7 @@ if __name__ == "__main__":
     # Initialize WandbLogger
     if opt['enable_wandb']:
         import wandb
+        print("Initializing wandblog.")
         wandb_logger = WandbLogger(opt)
         wandb.define_metric('validation/val_step')
         wandb.define_metric('epoch')
@@ -188,25 +189,25 @@ if __name__ == "__main__":
             diffusion.test(continous=True)
             visuals = diffusion.get_current_visuals()
 
-            hr_img = Metrics.tensor2img(visuals['HR'])  # uint8
-            lr_img = Metrics.tensor2img(visuals['LR'])  # uint8
-            fake_img = Metrics.tensor2img(visuals['INF'])  # uint8
+            hr_img = Metrics.tensor2img(visuals['HR'][0, (R, G, B), :, :])  # uint8
+            lr_img = Metrics.tensor2img(visuals['LR'][0, (R, G, B), :, :])  # uint8
+            fake_img = Metrics.tensor2img(visuals['INF'][0, (R, G, B), :, :])  # uint8
 
             sr_img_mode = 'grid'
             if sr_img_mode == 'single':
                 # single img series
-                sr_img = visuals['SR']  # uint8
+                sr_img = visuals['SR'][:, (R, G, B), :, :]  # uint8
                 sample_num = sr_img.shape[0]
                 for iter in range(0, sample_num):
                     Metrics.save_img(
                         Metrics.tensor2img(sr_img[iter]), '{}/{}_{}_sr_{}.png'.format(result_path, current_step, idx, iter))
             else:
                 # grid img
-                sr_img = Metrics.tensor2img(visuals['SR'])  # uint8
+                sr_img = Metrics.tensor2img(visuals['SR'][:, (R, G, B), :, :])  # uint8
                 Metrics.save_img(
                     sr_img, '{}/{}_{}_sr_process.png'.format(result_path, current_step, idx))
                 Metrics.save_img(
-                    Metrics.tensor2img(visuals['SR'][-1]), '{}/{}_{}_sr.png'.format(result_path, current_step, idx))
+                    Metrics.tensor2img(visuals['SR'][-1, (R, G, B), :, :]), '{}/{}_{}_sr.png'.format(result_path, current_step, idx))
 
             Metrics.save_img(
                 hr_img, '{}/{}_{}_hr.png'.format(result_path, current_step, idx))
@@ -216,14 +217,14 @@ if __name__ == "__main__":
                 fake_img, '{}/{}_{}_inf.png'.format(result_path, current_step, idx))
 
             # generation
-            eval_psnr = Metrics.calculate_psnr(Metrics.tensor2img(visuals['SR'][-1]), hr_img)
-            eval_ssim = Metrics.calculate_ssim(Metrics.tensor2img(visuals['SR'][-1]), hr_img)
+            eval_psnr = Metrics.calculate_psnr(Metrics.tensor2img(visuals['SR'][-1, (R, G, B), :, :]), hr_img)
+            eval_ssim = Metrics.calculate_ssim(Metrics.tensor2img(visuals['SR'][-1, (R, G, B), :, :]), hr_img)
 
             avg_psnr += eval_psnr
             avg_ssim += eval_ssim
 
             if wandb_logger and opt['log_eval']:
-                wandb_logger.log_eval_data(fake_img, Metrics.tensor2img(visuals['SR'][-1]), hr_img, eval_psnr, eval_ssim)
+                wandb_logger.log_eval_data(fake_img, Metrics.tensor2img(visuals['SR'][-1, (R, G, B), :, :]), hr_img, eval_psnr, eval_ssim)
 
         avg_psnr = avg_psnr / idx
         avg_ssim = avg_ssim / idx

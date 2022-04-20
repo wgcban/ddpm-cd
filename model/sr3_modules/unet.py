@@ -3,6 +3,8 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from inspect import isfunction
+from model.sr3_modules.hsi_e import hsi_e
+from model.sr3_modules.pan_e import pan_e
 
 
 def exists(x):
@@ -190,8 +192,12 @@ class UNet(nn.Module):
         pre_channel = inner_channel
         feat_channels = [pre_channel]
         now_res = image_size
-        downs = [nn.Conv2d(in_channel, inner_channel,
-                           kernel_size=3, padding=1)]
+
+        self.init_conv      = nn.Conv2d(in_channels=2*in_channel+1, out_channels=inner_channel, kernel_size=3, padding=1)
+        # self.pan_hsi_e      = hsi_e(in_channels=in_channel+1, mid_channels=64, out_channels=inner_channel)
+        # self.x_e            = hsi_e(in_channels=in_channel, mid_channels=64, out_channels=inner_channel)
+        
+        downs = []
         for ind in range(num_mults):
             is_last = (ind == num_mults - 1)
             use_attn = (now_res in attn_res)
@@ -232,11 +238,14 @@ class UNet(nn.Module):
 
         self.final_conv = Block(pre_channel, default(out_channel, in_channel), groups=norm_groups)
 
-    def forward(self, x, time):
+    def forward(self, x, pan, hsi_sr, time):
         t = self.noise_level_mlp(time) if exists(
             self.noise_level_mlp) else None
 
-        feats = []
+        #First downsampling layer
+        x           = self.init_conv(torch.cat((x, pan, hsi_sr), dim=1))
+
+        feats = [x]
         for layer in self.downs:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(x, t)

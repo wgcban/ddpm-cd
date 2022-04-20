@@ -103,8 +103,9 @@ def define_G(opt):
         model,
         image_size=model_opt['diffusion']['image_size'],
         channels=model_opt['diffusion']['channels'],
-        loss_type='l2',    # L1 or L2
+        loss_type=model_opt['diffusion']['loss'],    # L1 or L2
         conditional=model_opt['diffusion']['conditional'],
+        model_hsi=model_opt['diffusion']['model_hsi'],
         schedule_opt=model_opt['beta_schedule']['train']
     )
     if opt['phase'] == 'train':

@@ -203,7 +203,7 @@ class GaussianDiffusion(nn.Module):
         sample_inter = (1 | (self.num_timesteps//10))
 
         if not self.conditional:
-            shape = x_in['SR']
+            shape = x_in['RES']
             b = shape[0]
             img = torch.randn(shape, device=device)
             ret_img = img
@@ -211,10 +211,10 @@ class GaussianDiffusion(nn.Module):
                 img = self.p_sample(img, torch.full(
                     (b,), i, device=device, dtype=torch.long))
                 if i % sample_inter == 0:
-                    ret_img = torch.cat([ret_img, img], dim=0)
+                    ret_img = torch.cat([ret_img, img+x_in['SR']], dim=0)
             return img
         else:
-            x = x_in['SR']
+            x = x_in['RES']
             p = x_in['P']
             shape = x.shape
             b = shape[0]
@@ -224,7 +224,7 @@ class GaussianDiffusion(nn.Module):
                 img = self.p_sample(img, torch.full(
                     (b,), i, device=device, dtype=torch.long), condition_x=torch.cat((p,x), dim=1))
                 if i % sample_inter == 0:
-                    ret_img = torch.cat([ret_img, img], dim=0)
+                    ret_img = torch.cat([ret_img, img+x_in['SR']], dim=0)
         if continous:
             return ret_img
         else:
@@ -277,7 +277,7 @@ class GaussianDiffusion(nn.Module):
         # )
 
     def p_losses(self, x_in, noise=None):
-        x_start = x_in['HR']
+        x_start = x_in['RES']
         [b, c, h, w] = x_start.shape
         t = torch.randint(0, self.num_timesteps, (b,),
                           device=x_start.device).long()

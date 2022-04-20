@@ -1,8 +1,8 @@
 {
-    "name": "pansharpening-pavia-center-dataset-DDPM",
+    "name": "pansharpening-pavia-server",
     "phase": "train", // train or val
     "gpu_ids": [
-        0
+        3
     ],
     "path": { //set the path
         "log": "logs",
@@ -10,7 +10,8 @@
         "results": "results",
         "checkpoint": "checkpoint",
         "resume_state": null
-        // "resume_state": "experiments/sr_ffhq_210806_204158/checkpoint/I640000_E37" //pretrain model or training state
+        //"resume_state": "./../diff-large-files/experiments/sr_ffhq_210806_204158/checkpoint/I830000_E32"
+        //"resume_state": "experiments/sr_ffhq_210806_204158/checkpoint/I640000_E32" //pretrain model or training state
     },
     "datasets": {
         "train": {
@@ -20,8 +21,8 @@
             "datatype": "mat", //lmdb or img, path of img files
             "l_resolution": 40, // low resolution need to super_resolution
             "r_resolution": 160, // high resolution
-            "batch_size": 4,
-            "num_workers": 8,
+            "batch_size": 8,
+            "num_workers": 2,
             "use_shuffle": true,
             "data_len": -1 // -1 represents all data used in train
         },
@@ -40,34 +41,35 @@
             "B": 10}
     },
     "model": {
-        "which_model_G": "ddpm", // use the ddpm or sr3 network structure
+        "which_model_G": "sr3", // use the ddpm or sr3 network structure
         "finetune_norm": false,
         "unet": {
-            "in_channel": 205,
+            "in_channel": 102,
             "out_channel": 102,
-            "inner_channel": 64,
+            "inner_channel": 128,
             "channel_multiplier": [
                 1,
                 2,
                 4,
-                8,
-                8
-            ],
-            "attn_res": [
+                //8,
+                //8
                 16
             ],
-            "res_blocks": 2,
-            "dropout": 0.2
+            "attn_res": [
+                //16
+            ],
+            "res_blocks": 1,
+            "dropout": 0.0
         },
         "beta_schedule": { // use munual beta_schedule for acceleration
             "train": {
-                "schedule": "linear",
+                "schedule": "quad",
                 "n_timestep": 2000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2
             },
             "val": {
-                "schedule": "linear",
+                "schedule": "quad",
                 "n_timestep": 2000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2
@@ -76,6 +78,8 @@
         "diffusion": {
             "image_size": 160,
             "channels": 102, //sample channel
+            "loss": "l2", //options "l1" or "l2"
+            "model_hsi": true,
             "conditional": true // unconditional generation or unconditional generation(super_resolution)
         }
     },
@@ -83,10 +87,10 @@
         "n_iter": 1000000,
         "val_freq": 1e4,
         "save_checkpoint_freq": 1e4,
-        "print_freq": 200,
+        "print_freq": 100,
         "optimizer": {
             "type": "adam",
-            "lr": 1e-4
+            "lr": 1e-5
         },
         "ema_scheduler": { // not used now
             "step_start_ema": 5000,
@@ -95,6 +99,6 @@
         }
     },
     "wandb": {
-        "project": "sr_pavia"
+        "project": "sr_pavia_server"
     }
 }
