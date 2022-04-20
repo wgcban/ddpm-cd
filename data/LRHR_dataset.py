@@ -11,118 +11,25 @@ import scipy.io
 import numpy as np
 
 class LRHRDataset(Dataset):
-    def __init__(self, dataroot, datatype, l_resolution=16, r_resolution=128, split='train', data_len=-1, need_LR=False):
-        self.datatype = datatype
-        self.l_res = l_resolution
-        self.r_res = r_resolution
+    def __init__(self, dataroot, resolution=256, split='train', data_len=-1):
+        self.res = resolution
         self.data_len = data_len
-        self.need_LR = need_LR
         self.split = split
 
-        if datatype == 'lmdb':
-            self.env = lmdb.open(dataroot, readonly=True, lock=False,
-                                 readahead=False, meminit=False)
-            # init the datalen
-            with self.env.begin(write=False) as txn:
-                self.dataset_len = int(txn.get("length".encode("utf-8")))
-            if self.data_len <= 0:
-                self.data_len = self.dataset_len
-            else:
-                self.data_len = min(self.data_len, self.dataset_len)
-        elif datatype == 'img':
-            self.sr_path = Util.get_paths_from_images(
-                '{}/sr_{}_{}'.format(dataroot, l_resolution, r_resolution))
-            self.hr_path = Util.get_paths_from_images(
-                '{}/hr_{}'.format(dataroot, r_resolution))
-            if self.need_LR:
-                self.lr_path = Util.get_paths_from_images(
-                    '{}/lr_{}'.format(dataroot, l_resolution))
-            self.dataset_len = len(self.hr_path)
-            if self.data_len <= 0:
-                self.data_len = self.dataset_len
-            else:
-                self.data_len = min(self.data_len, self.dataset_len)
-        elif datatype == 'mat':
-            self.sr_path = Util.get_paths_from_mat(
-                '{}/sr_{}_{}'.format(dataroot, l_resolution, r_resolution))
-            self.hr_path = Util.get_paths_from_mat(
-                '{}/hr_{}'.format(dataroot, r_resolution))
-            self.p_path = Util.get_paths_from_mat(
-                '{}/p_{}'.format(dataroot, r_resolution))
-            if self.need_LR:
-                self.lr_path = Util.get_paths_from_mat(
-                    '{}/lr_{}'.format(dataroot, l_resolution))
-            self.dataset_len = len(self.hr_path)
-            if self.data_len <= 0:
-                self.data_len = self.dataset_len
-            else:
-                self.data_len = min(self.data_len, self.dataset_len)
+        self.path = Util.get_paths_from_images(dataroot)
+            
+        self.dataset_len = len(self.path)
+        if self.data_len <= 0:
+            self.data_len = self.dataset_len
         else:
-            raise NotImplementedError(
-                'data_type [{:s}] is not recognized.'.format(datatype))
+            self.data_len = min(self.data_len, self.dataset_len)
 
     def __len__(self):
         return self.data_len
 
     def __getitem__(self, index):
-        img_HR = None
-        img_LR = None
-        img_P  = None
+        img = Image.open(self.path[index]).convert("RGB")
 
-        if self.datatype == 'lmdb':
-            with self.env.begin(write=False) as txn:
-                hr_img_bytes = txn.get(
-                    'hr_{}_{}'.format(
-                        self.r_res, str(index).zfill(5)).encode('utf-8')
-                )
-                sr_img_bytes = txn.get(
-                    'sr_{}_{}_{}'.format(
-                        self.l_res, self.r_res, str(index).zfill(5)).encode('utf-8')
-                )
-                if self.need_LR:
-                    lr_img_bytes = txn.get(
-                        'lr_{}_{}'.format(
-                            self.l_res, str(index).zfill(5)).encode('utf-8')
-                    )
-                # skip the invalid index
-                while (hr_img_bytes is None) or (sr_img_bytes is None):
-                    new_index = random.randint(0, self.data_len-1)
-                    hr_img_bytes = txn.get(
-                        'hr_{}_{}'.format(
-                            self.r_res, str(new_index).zfill(5)).encode('utf-8')
-                    )
-                    sr_img_bytes = txn.get(
-                        'sr_{}_{}_{}'.format(
-                            self.l_res, self.r_res, str(new_index).zfill(5)).encode('utf-8')
-                    )
-                    if self.need_LR:
-                        lr_img_bytes = txn.get(
-                            'lr_{}_{}'.format(
-                                self.l_res, str(new_index).zfill(5)).encode('utf-8')
-                        )
-                img_HR = Image.open(BytesIO(hr_img_bytes)).convert("RGB")
-                img_SR = Image.open(BytesIO(sr_img_bytes)).convert("RGB")
-                if self.need_LR:
-                    img_LR = Image.open(BytesIO(lr_img_bytes)).convert("RGB")
-        elif self.datatype == 'img':
-            img_HR = Image.open(self.hr_path[index]).convert("RGB")
-            img_SR = Image.open(self.sr_path[index]).convert("RGB")
-            if self.need_LR:
-                img_LR = Image.open(self.lr_path[index]).convert("RGB")
-        elif self.datatype == 'mat':
-            img_HR = scipy.io.loadmat(self.hr_path[index])['hr'].transpose(2, 0, 1)
-            img_P  = np.expand_dims(scipy.io.loadmat(self.p_path[index])['p'], 0)
-            img_SR = np.array(scipy.io.loadmat(self.sr_path[index])['sr'].transpose(2, 0, 1))
-            img_res= img_HR-img_SR
-            if self.need_LR:
-                img_LR = scipy.io.loadmat(self.lr_path[index])['lr'].transpose(2, 0, 1)
-
-        if self.need_LR:
-            [img_LR, img_SR, img_P, img_HR] = Util.transform_augment_hsi(
-                [img_LR, img_SR, img_P, img_HR], split=self.split, min_max=(-1, 1))
-            return {'LR': img_LR, 'HR': img_HR, 'SR': img_SR, 'P': img_P, 'RES': img_res, 'Index': index}
-        else:
-            [img_SR, img_P, img_HR] = Util.transform_augment_hsi(
-                [img_SR, img_P, img_HR], split=self.split, min_max=(-1, 1))
+        img = Util.transform_augment(img, split=self.split, min_max=(-1, 1))
             
-            return {'HR': img_HR, 'SR': img_SR, 'P': img_P, 'RES': img_res, 'Index': index}
+        return {'img': img,  'Index': index}

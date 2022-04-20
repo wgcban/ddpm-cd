@@ -26,12 +26,9 @@ def create_dataset(dataset_opt, phase):
     mode = dataset_opt['mode']
     from data.LRHR_dataset import LRHRDataset as D
     dataset = D(dataroot=dataset_opt['dataroot'],
-                datatype=dataset_opt['datatype'],
-                l_resolution=dataset_opt['l_resolution'],
-                r_resolution=dataset_opt['r_resolution'],
+                resolution=dataset_opt['resolution'],
                 split=phase,
-                data_len=dataset_opt['data_len'],
-                need_LR=(mode == 'LRHR')
+                data_len=dataset_opt['data_len']
                 )
     logger = logging.getLogger('base')
     logger.info('Dataset [{:s} - {:s}] is created.'.format(dataset.__class__.__name__,
