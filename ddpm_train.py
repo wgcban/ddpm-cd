@@ -105,17 +105,14 @@ if __name__ == "__main__":
                 # validation
                 if current_step % opt['train']['val_freq'] == 0:
                     avg_psnr = 0.0
-                    idx = 0
                     result_path = '{}/{}'.format(opt['path']
                                                  ['results'], current_epoch)
                     os.makedirs(result_path, exist_ok=True)
 
                     diffusion.set_new_noise_schedule(
                         opt['model']['beta_schedule']['val'], schedule_phase='val')
-                    for _,  val_data in enumerate(val_loader):
-                        idx += 1
-                        diffusion.feed_data(val_data)
-                        diffusion.test(continous=False)
+                    for idx in range(opt['val'][n_samples]):
+                        diffusion.test(continous=True)
                         visuals = diffusion.get_current_visuals()
                         sr_img = Metrics.tensor2img(visuals['SR'][(R, G, B), :, :])  # uint8
                         hr_img = Metrics.tensor2img(visuals['HR'][0, (R, G, B), :, :])  # uint8
