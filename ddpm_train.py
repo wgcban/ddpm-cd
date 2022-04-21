@@ -163,6 +163,7 @@ if __name__ == "__main__":
 
             img_mode = 'grid'
             if img_mode == 'single':
+
                 # single img series
                 sam_img = visuals['SAM']
                 sample_num = sam_img.shape[0]

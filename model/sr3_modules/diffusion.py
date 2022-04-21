@@ -175,7 +175,6 @@ class GaussianDiffusion(nn.Module):
     def p_sample_loop(self, in_channels, img_size, continous=False):
         device = self.betas.device
         sample_inter = (1 | (self.num_timesteps//10))
-
         if not self.conditional:
             img = torch.randn((1, in_channels, img_size, img_size), device=device)
             ret_img = img
@@ -184,9 +183,10 @@ class GaussianDiffusion(nn.Module):
                     (1,), i, device=device, dtype=torch.long))
                 if i % sample_inter == 0:
                     ret_img = torch.cat([ret_img, img], dim=0)
-            return img
+            return ret_img
         else:
             print('Conditional sampling not supported.')
+        
         if continous:
             return ret_img
         else:

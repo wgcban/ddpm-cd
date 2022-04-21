@@ -1,16 +1,16 @@
 {
     "name": "ddpm-train-remote-sensing",
-    "phase": "train", // train or val
+    "phase": "val", // train or val
     "gpu_ids": [
-        9
+        8
     ],
     "path": { //set the path
         "log": "logs",
         "tb_logger": "tb_logger",
         "results": "results",
         "checkpoint": "checkpoint",
-        "resume_state": null
-        //"resume_state": "experiments/pansharpening-CAVE-SR3-feature-diff_220416_034738/checkpoint/I10000_E667"
+        //"resume_state": null
+        "resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I80000_E32"
     },
     "datasets": {
         "train": {
@@ -57,7 +57,7 @@
             },
             "val": {
                 "schedule": "linear",
-                "n_timestep": 2000,
+                "n_timestep": 4000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2
             }
