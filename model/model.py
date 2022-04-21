@@ -170,7 +170,7 @@ class DDPM(BaseModel):
                 gen_path), strict=False)
                 
             if self.opt['phase'] == 'train':
-                optimizer
+                #optimizer
                 opt = torch.load(opt_path)
                 self.optG.load_state_dict(opt['optimizer'])
                 self.begin_step = opt['iter']

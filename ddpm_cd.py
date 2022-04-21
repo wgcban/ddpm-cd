@@ -70,15 +70,15 @@ if __name__ == "__main__":
     diffusion = Model.create_model(opt)
     logger.info('Initial Model Finished')
 
-    #Model initialization
-    if opt['path']['resume_state']:
-        logger.info('Resuming training from epoch: {}, iter: {}.'.format(
-            current_epoch, current_step))
-        print("Finished model initialization.")
-
-    exit()
+    #Set noise schedule
     diffusion.set_new_noise_schedule(
         opt['model']['beta_schedule'][opt['phase']], schedule_phase=opt['phase'])
+    
+    # Training loop
+    current_step = 0
+    current_epoch = 0
+    n_iter = opt['train']['n_iter']
+    
     if opt['phase'] == 'train':
         while current_step < n_iter:
             current_epoch += 1
@@ -86,6 +86,10 @@ if __name__ == "__main__":
                 current_step += 1
                 if current_step > n_iter:
                     break
+                
+                print("Start training the CD classifier...")
+
+                exit()
                 diffusion.feed_data(train_data)
                 diffusion.optimize_parameters()
                 # log
