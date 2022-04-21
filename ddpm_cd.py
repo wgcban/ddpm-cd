@@ -12,7 +12,7 @@ import numpy as np
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', type=str, default='config/ddpm_train.json',
+    parser.add_argument('-c', '--config', type=str, default='config/ddpm_cd.json',
                         help='JSON file for configuration')
     parser.add_argument('-p', '--phase', type=str, choices=['train', 'val'],
                         help='Run either train(training) or val(generation)', default='train')
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     for phase, dataset_opt in opt['datasets'].items():
         if phase == 'train' and args.phase != 'val':
             print("Creating train dataloader.")
-            train_set   = Data.create_image_dataset(dataset_opt, phase)
+            train_set   = Data.create_cd_dataset(dataset_opt, phase)
             train_loader= Data.create_dataloader(
                 train_set, dataset_opt, phase)
         elif phase == 'val':
@@ -65,19 +65,18 @@ if __name__ == "__main__":
             # val_set, dataset_opt, phase)
     logger.info('Initial Dataset Finished')
 
+
     # model
     diffusion = Model.create_model(opt)
     logger.info('Initial Model Finished')
 
-    # Train
-    current_step = diffusion.begin_step
-    current_epoch = diffusion.begin_epoch
-    n_iter = opt['train']['n_iter']
-
+    #Model initialization
     if opt['path']['resume_state']:
         logger.info('Resuming training from epoch: {}, iter: {}.'.format(
             current_epoch, current_step))
+        print("Finished model initialization.")
 
+    exit()
     diffusion.set_new_noise_schedule(
         opt['model']['beta_schedule'][opt['phase']], schedule_phase=opt['phase'])
     if opt['phase'] == 'train':

@@ -233,7 +233,7 @@ class UNet(nn.Module):
 
         self.final_conv = Block(pre_channel, default(out_channel, in_channel), groups=norm_groups)
 
-    def forward(self, x, time):
+    def forward(self, x, time, feat_need=False):
         t = self.noise_level_mlp(time) if exists(
             self.noise_level_mlp) else None
 
@@ -260,4 +260,9 @@ class UNet(nn.Module):
             else:
                 x = layer(x)
 
-        return self.final_conv(x)
+        x = self.final_conv(x)
+
+        if not feat_need:
+            return x
+        else:
+            return feats

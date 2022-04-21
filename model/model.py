@@ -75,6 +75,16 @@ class DDPM(BaseModel):
                 self.sampled_img = self.netG.sampling_imgs(
                     in_channels, img_size, continous)
         self.netG.train()
+    
+    # Get feature representations for a given image
+    def get_feats(self, x, t):
+        self.netG.eval()
+        with torch.no_grad():
+            if isinstance(self.netG, nn.DataParallel):
+                self.img_feats = self.netG.module.feats(x, t)
+            else:
+                self.img_feats = self.netG.feats(x, t)
+        self.netG.train()
 
     def sample(self, batch_size=1, continous=False):
         self.netG.eval()

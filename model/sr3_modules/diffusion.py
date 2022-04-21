@@ -239,3 +239,33 @@ class GaussianDiffusion(nn.Module):
 
     def forward(self, x, *args, **kwargs):
         return self.p_losses(x, *args, **kwargs)
+
+    # Get features from the diffusion model
+    @torch.no_grad()
+    def feats(self, x, t):
+        '''
+        x: input image that you want to get features
+        t: time step
+        '''
+
+        x_start = x
+        [b, c, h, w] = x_start.shape
+        
+        continuous_sqrt_alpha_cumprod = torch.FloatTensor(
+            np.random.uniform(
+                self.sqrt_alphas_cumprod_prev[t-1],
+                self.sqrt_alphas_cumprod_prev[t],
+                size=b
+            )
+        ).to(x_start.device)
+        continuous_sqrt_alpha_cumprod = continuous_sqrt_alpha_cumprod.view(
+            b, -1)
+
+        noise = default(noise, lambda: torch.randn_like(x_start))
+        
+        x_noisy = self.q_sample(
+            x_start=x_start, continuous_sqrt_alpha_cumprod=continuous_sqrt_alpha_cumprod.view(-1, 1, 1, 1), noise=noise)
+
+        feats = self.denoise_fn(x_noisy, continuous_sqrt_alpha_cumprod, feat_need=True)
+
+        return feats

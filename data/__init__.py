@@ -20,11 +20,26 @@ def create_dataloader(dataset, dataset_opt, phase):
         raise NotImplementedError(
             'Dataloader [{:s}] is not found.'.format(phase))
 
-
-def create_dataset(dataset_opt, phase):
+# Create image dataset
+def create_image_dataset(dataset_opt, phase):
     '''create dataset'''
     mode = dataset_opt['mode']
-    from data.LRHR_dataset import LRHRDataset as D
+    from data.ImageDataset import ImageDataset as D
+    dataset = D(dataroot=dataset_opt['dataroot_AB'],
+                resolution=dataset_opt['resolution'],
+                split=phase,
+                data_len=dataset_opt['data_len']
+                )
+    logger = logging.getLogger('base')
+    logger.info('Dataset [{:s} - {:s}] is created.'.format(dataset.__class__.__name__,
+                                                           dataset_opt['name']))
+    return dataset
+
+# Create cd dataset
+def create_cd_dataset(dataset_opt, phase):
+    '''create dataset'''
+    mode = dataset_opt['mode']
+    from data.CDDataset import CDDataset as D
     dataset = D(dataroot=dataset_opt['dataroot'],
                 resolution=dataset_opt['resolution'],
                 split=phase,

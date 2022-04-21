@@ -10,7 +10,7 @@ import scipy.io
 
 import numpy as np
 
-class LRHRDataset(Dataset):
+class ImageDataset(Dataset):
     def __init__(self, dataroot, resolution=256, split='train', data_len=-1):
         self.res = resolution
         self.data_len = data_len
