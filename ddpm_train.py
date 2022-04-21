@@ -62,7 +62,7 @@ if __name__ == "__main__":
             print("Unconditional Sampling. No validation dataloader required.")
             # val_set = Data.create_dataset(dataset_opt, phase)
             # val_loader = Data.create_dataloader(
-            #     val_set, dataset_opt, phase)
+            # val_set, dataset_opt, phase)
     logger.info('Initial Dataset Finished')
 
     # model
@@ -155,10 +155,9 @@ if __name__ == "__main__":
         logger.info('End of training.')
     else:
         logger.info('Begin Model Evaluation.')
-        idx = 0
         result_path = '{}'.format(opt['path']['results'])
         os.makedirs(result_path, exist_ok=True)
-        for idx in range(opt['datasets']['val']['data_len']):
+        for idx in range(0, opt['datasets']['val']['data_len']):
             diffusion.test(in_channels=opt['model']['unet']['in_channel'], img_size=opt['datasets']['val']['resolution'], continous=True)
             visuals = diffusion.get_current_visuals()
 

@@ -2,7 +2,7 @@
     "name": "ddpm-train-remote-sensing",
     "phase": "train", // train or val
     "gpu_ids": [
-        9
+        8
     ],
     "path": { //set the path
         "log": "logs",
@@ -25,7 +25,7 @@
         "val": {
             "name": "LEVIR-CD-256",
             "resolution": 256,
-            "data_len": 1
+            "data_len": 20
         }
     },
     "model": {
