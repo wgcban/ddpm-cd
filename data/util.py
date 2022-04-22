@@ -95,3 +95,8 @@ def transform_augment(img, split='val', min_max=(0, 1)):
         img = hflip(img)
     ret_img = img * (min_max[1] - min_max[0]) + min_max[0]
     return ret_img
+
+def transform_augment_cd(img, split='val', min_max=(0, 1)):
+    img = totensor(img)
+    ret_img = img * (min_max[1] - min_max[0]) + min_max[0]
+    return ret_img

@@ -1,5 +1,5 @@
 {
-    "name": "ddpm-train-remote-sensing",
+    "name": "ddpm-cd",
     "phase": "train", // train or val
     "gpu_ids": [
         8
@@ -10,14 +10,24 @@
         "results": "results",
         "checkpoint": "checkpoint",
         //"resume_state": null
-        "resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I100000_E40"
+        "resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I190000_E75"
     },
+
+    "path_cd": { //set the path
+        "log": "logs",
+        "tb_logger": "tb_logger",
+        "results": "results",
+        "checkpoint": "checkpoint",
+        "resume_state": null
+        //"resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I190000_E75"
+    },
+
     "datasets": {
         "train": {
             "name": "LEVIR-CD-256",
             "dataroot": "dataset/LEVIR-CD-256/",
             "resolution": 256, // high resolution
-            "batch_size": 8,
+            "batch_size": 4,
             "num_workers": 8,
             "use_shuffle": true,
             "data_len": -1 // -1 represents all data used in train
@@ -25,9 +35,16 @@
         "val": {
             "name": "LEVIR-CD-256",
             "resolution": 256,
-            "data_len": 20
+            "data_len": 3
         }
     },
+
+    "model_cd": {
+        "feat_scales": 9,
+        "out_channels": 2,
+        "loss_type": "ce"
+    },
+
     "model": {
         "which_model_G": "sr3", // use the ddpm or sr3 network structure
         "finetune_norm": false,
@@ -71,20 +88,15 @@
     },
     "train": {
         "n_iter": 1000000,
-        "val_freq": 1e4,
-        "save_checkpoint_freq": 1e4,
+        "val_freq": 1000,
+        "save_checkpoint_freq": 1000,
         "print_freq": 100,
         "optimizer": {
-            "type": "adam",
+            "type": "adamw",
             "lr": 1e-5
-        },
-        "ema_scheduler": { // not used now
-            "step_start_ema": 5000,
-            "update_ema_every": 1,
-            "ema_decay": 0.9999
         }
     },
     "wandb": {
-        "project": "ddpm-unet-remote-sensing"
+        "project": "ddpm-cd"
     }
 }

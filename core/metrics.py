@@ -38,6 +38,10 @@ def save_img(img, img_path, mode='RGB'):
     cv2.imwrite(img_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
     # cv2.imwrite(img_path, img)
 
+def save_feat(img, img_path, mode='RGB'):
+    cv2.imwrite(img_path, cv2.applyColorMap(img, cv2.COLORMAP_JET))
+    # cv2.imwrite(img_path, img)
+
 
 def calculate_psnr(img1, img2):
     # img1 and img2 have range [0, 255]

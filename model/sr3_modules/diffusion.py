@@ -242,7 +242,7 @@ class GaussianDiffusion(nn.Module):
 
     # Get features from the diffusion model
     @torch.no_grad()
-    def feats(self, x, t):
+    def feats(self, x, t, noise=None):
         '''
         x: input image that you want to get features
         t: time step

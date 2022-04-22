@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch.nn import init
 from torch.nn import modules
 logger = logging.getLogger('base')
+from model.cd_modules.cd_head import cd_head
 ####################
 # initialize
 ####################
@@ -114,3 +115,17 @@ def define_G(opt):
         assert torch.cuda.is_available()
         netG = nn.DataParallel(netG)
     return netG
+
+# Change Detection Network
+def define_CD(opt):
+    cd_model_opt = opt['model_cd']
+    
+    netCD = cd_head(feat_scales=cd_model_opt['feat_scales'], out_channels=cd_model_opt['out_channels'])
+    
+    if opt['phase'] == 'train':
+        # init_weights(netG, init_type='kaiming', scale=0.1)
+        init_weights(netCD, init_type='orthogonal')
+    if opt['gpu_ids'] and opt['distributed']:
+        assert torch.cuda.is_available()
+        netCD = nn.DataParallel(netCD)
+    return netCD

@@ -77,14 +77,19 @@ class DDPM(BaseModel):
         self.netG.train()
     
     # Get feature representations for a given image
-    def get_feats(self, x, t):
+    def get_feats(self, t):
         self.netG.eval()
+        A = self.data["A"]
+        B = self.data["B"]
         with torch.no_grad():
             if isinstance(self.netG, nn.DataParallel):
-                self.img_feats = self.netG.module.feats(x, t)
+                feats_A = self.netG.module.feats(A, t)
+                feats_B = self.netG.module.feats(B, t)
             else:
-                self.img_feats = self.netG.feats(x, t)
+                feats_A = self.netG.feats(A, t)
+                feats_B = self.netG.feats(B, t)
         self.netG.train()
+        return feats_A, feats_B
 
     def sample(self, batch_size=1, continous=False):
         self.netG.eval()

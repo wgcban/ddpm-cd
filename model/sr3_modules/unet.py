@@ -247,6 +247,9 @@ class UNet(nn.Module):
             else:
                 x = layer(x)
             feats.append(x)
+        
+        if feat_need:
+            return feats
 
         for layer in self.mid:
             if isinstance(layer, ResnetBlocWithAttn):
@@ -261,8 +264,4 @@ class UNet(nn.Module):
                 x = layer(x)
 
         x = self.final_conv(x)
-
-        if not feat_need:
-            return x
-        else:
-            return feats
+        return x
