@@ -89,7 +89,7 @@ def transform2tensor(img, min_max=(0, 1)):
 # implementation by torchvision, detail in https://github.com/Janspiry/Image-Super-Resolution-via-Iterative-Refinement/issues/14
 totensor = torchvision.transforms.ToTensor()
 hflip = torchvision.transforms.RandomHorizontalFlip()
-rotater = T.RandomRotation(degrees=(0, 90, 180, 270))
+rotater = T.RandomRotation(degrees=(0, 90))
 
 # augmentations for images
 def transform_augment(img, split='val', min_max=(0, 1)):
