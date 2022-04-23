@@ -1,5 +1,5 @@
 {
-    "name": "ddpm-train-remote-sensing",
+    "name": "ddpm-RS",
     "phase": "train", // train or val
     "gpu_ids": [
         9
@@ -8,14 +8,14 @@
         "log": "logs",
         "tb_logger": "tb_logger",
         "results": "results",
-        "checkpoint": "checkpoint",
-        "resume_state": null
-        //"resume_state": "experiments/pansharpening-CAVE-SR3-feature-diff_220416_034738/checkpoint/I10000_E667"
+        "checkpoint": "checkpoint"
+        //"resume_state": null
+        //"resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I190000_E75"
     },
     "datasets": {
         "train": {
-            "name": "LEVIR-CD-256",
-            "dataroot": "dataset/LEVIR-CD-256/AB",
+            "name": "LEVIR-WHU-DSIFN",
+            "dataroot": "dataset/LEVIR-WHU-DSIFN",
             "resolution": 256, // high resolution
             "batch_size": 8,
             "num_workers": 8,
@@ -85,6 +85,6 @@
         }
     },
     "wandb": {
-        "project": "ddpm-unet-remote-sensing"
+        "project": "ddpm-RS-unet"
     }
 }

@@ -57,8 +57,8 @@ class cd_head(nn.Module):
             input_A = torch.cat((input_A, f_A), dim=1)
             input_B = torch.cat((input_B, f_B), dim=1)
 
-        cm = torch.abs(self.conv1(input_A)-self.conv1(input_B))
-
+        cm = torch.abs(input_A-input_B)
+        cm = self.conv1(cm)
         cm = self.relu(self.conv_cd_1(cm))
         cm = self.conv_cd_2(cm)
 

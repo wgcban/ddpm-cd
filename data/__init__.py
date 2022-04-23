@@ -25,7 +25,7 @@ def create_image_dataset(dataset_opt, phase):
     '''create dataset'''
     mode = dataset_opt['mode']
     from data.ImageDataset import ImageDataset as D
-    dataset = D(dataroot=dataset_opt['dataroot_AB'],
+    dataset = D(dataroot=dataset_opt['dataroot'],
                 resolution=dataset_opt['resolution'],
                 split=phase,
                 data_len=dataset_opt['data_len']

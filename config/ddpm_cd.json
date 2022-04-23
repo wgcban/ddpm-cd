@@ -92,8 +92,8 @@
         "save_checkpoint_freq": 1000,
         "print_freq": 100,
         "optimizer": {
-            "type": "adamw",
-            "lr": 1e-5
+            "type": "adam",
+            "lr": 1e-4
         }
     },
     "wandb": {
