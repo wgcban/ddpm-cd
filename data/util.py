@@ -3,6 +3,7 @@ import torch
 import torchvision
 import random
 import numpy as np
+import torchvision.transforms as T
 
 IMG_EXTENSIONS = ['.jpg', '.JPG', '.jpeg', '.JPEG',
                   '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP']
@@ -88,11 +89,14 @@ def transform2tensor(img, min_max=(0, 1)):
 # implementation by torchvision, detail in https://github.com/Janspiry/Image-Super-Resolution-via-Iterative-Refinement/issues/14
 totensor = torchvision.transforms.ToTensor()
 hflip = torchvision.transforms.RandomHorizontalFlip()
+rotater = T.RandomRotation(degrees=(0, 90, 180, 270))
 
+# augmentations for images
 def transform_augment(img, split='val', min_max=(0, 1)):
     img = totensor(img)
     if split == 'train':
         img = hflip(img)
+        img = rotater(img)
     ret_img = img * (min_max[1] - min_max[0]) + min_max[0]
     return ret_img
 

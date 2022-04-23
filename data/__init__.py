@@ -35,7 +35,7 @@ def create_image_dataset(dataset_opt, phase):
                                                            dataset_opt['name']))
     return dataset
 
-# Create cd dataset
+# Create change-detection dataset
 def create_cd_dataset(dataset_opt, phase):
     '''create dataset'''
     mode = dataset_opt['mode']

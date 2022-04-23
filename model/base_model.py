@@ -27,16 +27,21 @@ class BaseModel():
         pass
 
     def set_device(self, x):
-        if isinstance(x, dict):
-            for key, item in x.items():
-                if item is not None:
-                    x[key] = item.to(self.device, dtype=torch.float)
-        elif isinstance(x, list):
-            for item in x:
-                if item is not None:
-                    item = item.to(self.device, dtype=torch.float)
-        else:
-            x = x.to(self.device, dtype=torch.float)
+        if torch.cuda.device_count() > 1:
+            print("Let's use", torch.cuda.device_count(), "GPUs!")
+            # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
+            x = nn.DataParallel(x)
+        else: 
+            if isinstance(x, dict):
+                for key, item in x.items():
+                    if item is not None:
+                        x[key] = item.to(self.device, dtype=torch.float)
+            elif isinstance(x, list):
+                for item in x:
+                    if item is not None:
+                        item = item.to(self.device, dtype=torch.float)
+            else:
+                x = x.to(self.device, dtype=torch.float)
         return x
 
     def get_network_description(self, network):
