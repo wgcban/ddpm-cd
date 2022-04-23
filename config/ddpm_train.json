@@ -1,5 +1,5 @@
 {
-    "name": "ddpm-RS",
+    "name": "ddpm-RS-Unet",
     "phase": "train", // train or val
     "gpu_ids": [
         9
