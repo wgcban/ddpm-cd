@@ -88,6 +88,7 @@
             "conditional": false // unconditional generation or unconditional generation(super_resolution)
         }
     },
+    
     "train": {
         "n_iter": 1000000,
         "val_freq": 1000,
