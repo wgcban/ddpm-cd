@@ -120,13 +120,22 @@ def define_G(opt):
 # Change Detection Network
 def define_CD(opt):
     cd_model_opt = opt['model_cd']
+    diffusion_model_opt = opt['model']
     
-    netCD = cd_head(feat_scales=cd_model_opt['feat_scales'], out_channels=cd_model_opt['out_channels'])
+    # Define change detection network head
+    netCD = cd_head(feat_scales=cd_model_opt['feat_scales'], 
+                    out_channels=cd_model_opt['out_channels'], 
+                    inner_channel=diffusion_model_opt['inner_channel'], 
+                    channel_multiplier=diffusion_model_opt['channel_multiplier'],
+                    img_size=cd_model_opt['output_cm_size'])
     
+    # Initialize the change detection head if it is 'train' phase 
     if opt['phase'] == 'train':
+        # Try different initialization methods
         # init_weights(netG, init_type='kaiming', scale=0.1)
         init_weights(netCD, init_type='orthogonal')
     if opt['gpu_ids'] and opt['distributed']:
         assert torch.cuda.is_available()
         netCD = nn.DataParallel(netCD)
+    
     return netCD

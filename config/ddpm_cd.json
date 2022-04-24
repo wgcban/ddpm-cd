@@ -4,22 +4,23 @@
     "gpu_ids": [
         8
     ],
-    "path": { //set the path
+
+    "path": { //set the paths
         "log": "logs",
         "tb_logger": "tb_logger",
         "results": "results",
         "checkpoint": "checkpoint",
         //"resume_state": null
-        "resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I190000_E75"
+        "resume_state": "experiments/ddpm-RS-Unet_220423_130407/checkpoint/I110000_E14" //set path to pre-trained diffusion model
     },
 
-    "path_cd": { //set the path
+    "path_cd": { //set the path 
         "log": "logs",
         "tb_logger": "tb_logger",
         "results": "results",
         "checkpoint": "checkpoint",
         "resume_state": null
-        //"resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I190000_E75"
+        //"resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I190000_E75" //Seth path to train cd-head
     },
 
     "datasets": {
@@ -40,9 +41,10 @@
     },
 
     "model_cd": {
-        "feat_scales": 9,
+        "feat_scales": [6, 7, 8, 9, 10, 11, 12],
         "out_channels": 2,
-        "loss_type": "ce"
+        "loss_type": "ce",
+        "output_cm_size": 256
     },
 
     "model": {

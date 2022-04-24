@@ -5,62 +5,79 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.padding import ReplicationPad2d
 
-#get input feature maps
-def get_in_channels(feat_scales):
-    if feat_scales <= 3:
-        in_channels = (feat_scales)*64
-    elif feat_scales <=7:
-        in_channels = 4*64 + (feat_scales-4)*128
-    elif feat_scales <=9:
-        in_channels = 4*64 + 3*128 + (feat_scales-7)*256
-    elif feat_scales <=11:
-        in_channels = 4*64 + 2*128 + 3*256 + 3*512
-    elif feat_scales <=14:
-        in_channels = 4*64 + 2*128 + 3*256 + 3*512 + 3*512
-    else:
-        print('Unbounded number for feat_scales. 0<=feat_scales<=14')
-    
+def get_in_channels(feat_scales, inner_channel, channel_multiplier):
+    '''
+    Get the number of input layers to the change detection head.
+    '''
+    in_channels = 0
+    for scale in feat_scales:
+        if scale < 4: #256 x 256
+            in_channels += inner_channel*channel_multiplier[0]
+        elif scale < 6: #128 x 128
+            in_channels += inner_channel*channel_multiplier[1]
+        elif scale < 7: #64 x 64
+            in_channels += inner_channel*channel_multiplier[1]
+        elif scale < 10: #64 x 64
+            in_channels += inner_channel*channel_multiplier[2]
+        elif scale < 12: #32 x 32
+            in_channels += inner_channel*channel_multiplier[3]
+        elif scale < 15: #16 x 16
+            in_channels += inner_channel*channel_multiplier[4]
+        else:
+            print('Unbounded number for feat_scales. 0<=feat_scales<=14') 
     return in_channels
     
 
 class cd_head(nn.Module):
-    """MLP change detection head."""
+    '''
+    Change detection head.
+    '''
 
-    def __init__(self, feat_scales, out_channels=2):
+    def __init__(self, feat_scales, out_channels=2, inner_channel, channel_multiplier, img_size=256):
         super(cd_head, self).__init__()
 
-        self.feat_scales = feat_scales
-        self.in_channels = get_in_channels(feat_scales)
+        # Define the parameters of the change detection head
+        self.feat_scales    = feat_scales
+        self.in_channels    = get_in_channels(feat_scales, inner_channel, channel_multiplier)
+        self.img_size       = img_size
 
-        # Convolutional layer to reduce the feature dimention
-        self.conv1 = nn.Conv2d(self.in_channels, 64, kernel_size=3, padding=1)
+        # Convolutional layers before parsing to difference head
+        self.diff_layers = nn.ModuleList()
+        for feat in feat_scales:
+            self.diff_layers.append(nn.Conv2d(get_in_channels([feat]), get_in_channels([feat]), kernel_size=3, padding=1))
 
-        # Convolutional layer to get final prediction map
-        self.conv_cd_1 = nn.Conv2d(64, 32, kernel_size=3, padding=1)
-        self.conv_cd_2 = nn.Conv2d(32, out_channels, kernel_size=3, padding=1)
+        #MLP layer to reduce the feature dimention
+        self.conv1_final = nn.Conv2d(self.in_channels, 64, kernel_size=1, padding=0)
+
+        #Get final change map
+        self.conv2_final = nn.Conv2d(64, out_channels, kernel_size=3, padding=1)
 
         self.relu = torch.nn.ReLU()
 
-    def forward(self, feats_A, feats_B): 
+    def forward(self, feats_A, feats_B):
+
+        feats_diff = []
+        c=0
+        for layer in self.diff_layers:
+            x = torch.abs(layer(feats_A[self.feat_scales[c]]) - layer(feats_B[self.feat_scales[c]]))
+            feats_diff.append(x)
+            c+=1
         
-        input_A = feats_A[0]
-        input_B = feats_B[0]
-
-        for i in range(1, self.feat_scales):
-            if feats_A[i].size(2) != feats_A[0].size(2):
-                f_A = F.interpolate(feats_A[i], size=(feats_A[0].size(2), feats_A[0].size(3)), mode="bilinear")
-                f_B = F.interpolate(feats_B[i], size=(feats_B[0].size(2), feats_B[0].size(3)), mode="bilinear")
+        c=0
+        for i in range(0, len(feats_diff)):
+            if feats_diff[i].size(2) != self.img_size:
+                feat_diff_up = F.interpolate(feats_diff[i], size=(self.img_size, self.img_size), mode="bilinear")
             else:
-                f_A = feats_A[i]
-                f_B = feats_B[i]
+                feat_diff_up = feats_diff[i]
             
-            input_A = torch.cat((input_A, f_A), dim=1)
-            input_B = torch.cat((input_B, f_B), dim=1)
+            #Concatenating upsampled features to ''feats_diff_up''
+            if c==0:
+                feats_diff_up = feat_diff_up
+                c+=1
+            else:
+                feats_diff_up = torch.cat((feats_diff_up, feat_diff_up), dim=1)
 
-        cm = torch.abs(input_A-input_B)
-        cm = self.conv1(cm)
-        cm = self.relu(self.conv_cd_1(cm))
-        cm = self.conv_cd_2(cm)
+        cm = self.conv2_final(self.relu(self.conv1_final(feats_diff_up)))
 
         return cm
 
