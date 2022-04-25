@@ -6,6 +6,7 @@ import torch.nn as nn
 import os
 import model.networks as networks
 from .base_model import BaseModel
+from misc.metric_tool import ConfuseMatrixMeter
 logger = logging.getLogger('base')
 
 
@@ -41,20 +42,21 @@ class CD(BaseModel):
         self.load_network()
         self.print_network()
 
-    def feed_data(self, feats_A, feats_B, train_data):
+        self.running_metric = ConfuseMatrixMeter(n_class=2)
+        self.len_train_dataloader = opt["len_train_dataloader"]
+        self.len_val_dataloader = opt["len_val_dataloader"]
+
+    def feed_data(self, feats_A, feats_B, data):
         self.feats_A = feats_A
         self.feats_B = feats_B
-        self.train_data    = self.set_device(train_data)
+        self.data = self.set_device(data)
 
     def optimize_parameters(self):
         self.optCD.zero_grad()
         self.pred_cm = self.netCD(self.feats_A, self.feats_B)
-        l_cd = self.loss_func(self.pred_cm, self.train_data["L"].long())
-        # need to average in multi-gpu
+        l_cd = self.loss_func(self.pred_cm, self.data["L"].long())
         l_cd.backward()
         self.optCD.step()
-
-        # set log
         self.log_dict['l_cd'] = l_cd.item()
 
     def test(self):
@@ -73,7 +75,7 @@ class CD(BaseModel):
     def get_current_visuals(self):
         out_dict = OrderedDict()
         out_dict['pred_cm'] = torch.argmax(self.pred_cm, dim=1, keepdim=False)
-        out_dict['gt_cm'] = self.train_data['L']
+        out_dict['gt_cm'] = self.data['L']
         return out_dict
 
     def print_network(self):
@@ -130,3 +132,35 @@ class CD(BaseModel):
                 self.optCD.load_state_dict(opt['optimizer'])
                 self.begin_step = opt['iter']
                 self.begin_epoch = opt['epoch']
+    
+    # Functions related to computing performance metrics for CD
+    def _update_metric(self):
+        """
+        update metric
+        """
+        target = self.data['L'].detach()
+        G_pred = self.pred_cm.detach()
+
+        G_pred = torch.argmax(G_pred, dim=1)
+
+        current_score = self.running_metric.update_cm(pr=G_pred.cpu().numpy(), gt=target.cpu().numpy())
+        return current_score
+    
+    def _collect_running_batch_states(self):
+        self.running_acc = self._update_metric()
+        self.log_dict['running_acc'] = running_acc.item()
+
+
+    def _collect_epoch_states(self):
+        scores = self.running_metric.get_scores()
+        self.epoch_acc = scores['mf1']
+        self.log_dict['epoch_acc'] = self.epoch_acc.item()
+
+        for k, v in scores.items():
+            self.log_dict[k] = v
+            #message += '%s: %.5f ' % (k, v)
+
+    
+    def _clear_cache(self):
+        self.running_metric.clear()
+        

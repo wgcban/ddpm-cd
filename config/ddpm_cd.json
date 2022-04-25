@@ -1,5 +1,5 @@
 {
-    "name": "ddpm-cd",
+    "name": "ddpm-RS-CDHead",
     "phase": "train", // train or val
     "gpu_ids": [
         8
@@ -11,7 +11,7 @@
         "results": "results",
         "checkpoint": "checkpoint",
         //"resume_state": null
-        "resume_state": "experiments/ddpm-RS-Unet_220423_130407/checkpoint/I110000_E14" //set path to pre-trained diffusion model
+        "resume_state": "experiments/ddpm-RS-Unet_220425_062858/checkpoint/I10000_E2" //set path to pre-trained diffusion model
     },
 
     "path_cd": { //set the path 
@@ -53,7 +53,7 @@
         "unet": {
             "in_channel": 3,
             "out_channel": 3,
-            "inner_channel": 64,
+            "inner_channel": 128,
             "channel_multiplier": [
                 1,
                 2,
@@ -90,9 +90,9 @@
     },
     
     "train": {
-        "n_iter": 1000000,
-        "val_freq": 1000,
-        "save_checkpoint_freq": 1000,
+        "n_epoch": 80,
+        "val_freq": 1,
+        "save_checkpoint_freq": 1,
         "print_freq": 100,
         "optimizer": {
             "type": "adam",
@@ -100,6 +100,6 @@
         }
     },
     "wandb": {
-        "project": "ddpm-cd"
+        "project": "ddpm-unet-remote-sensing"
     }
 }
