@@ -3,7 +3,7 @@
     "phase": "train", // train or val
     "distributed": true,
     "gpu_ids": [
-        7,8
+        1
     ],
     "path": { //set the path
         "log": "logs",
@@ -35,7 +35,7 @@
         "unet": {
             "in_channel": 3,
             "out_channel": 3,
-            "inner_channel": 64,
+            "inner_channel": 128,
             "channel_multiplier": [
                 1,
                 2,

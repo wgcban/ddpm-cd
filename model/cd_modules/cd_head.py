@@ -33,7 +33,7 @@ class cd_head(nn.Module):
     Change detection head.
     '''
 
-    def __init__(self, feat_scales, out_channels=2, inner_channel, channel_multiplier, img_size=256):
+    def __init__(self, feat_scales, out_channels=2, inner_channel=None, channel_multiplier=None, img_size=256):
         super(cd_head, self).__init__()
 
         # Define the parameters of the change detection head
