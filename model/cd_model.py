@@ -37,20 +37,21 @@ class CD(BaseModel):
             else:
                 raise NotImplementedError(
                     'Optimizer [{:s}] not implemented'.format(opt['train']["optimizer"]["type"]))
-
             self.log_dict = OrderedDict()
         self.load_network()
         self.print_network()
 
-        self.running_metric = ConfuseMatrixMeter(n_class=2)
+        self.running_metric = ConfuseMatrixMeter(n_class=opt['model_cd']['out_channels'])
         self.len_train_dataloader = opt["len_train_dataloader"]
         self.len_val_dataloader = opt["len_val_dataloader"]
 
+    # Feeding all data to the CD model
     def feed_data(self, feats_A, feats_B, data):
         self.feats_A = feats_A
         self.feats_B = feats_B
         self.data = self.set_device(data)
 
+    # Optimize the parameters of the CD model
     def optimize_parameters(self):
         self.optCD.zero_grad()
         self.pred_cm = self.netCD(self.feats_A, self.feats_B)
@@ -59,6 +60,7 @@ class CD(BaseModel):
         self.optCD.step()
         self.log_dict['l_cd'] = l_cd.item()
 
+    # Testing on given data
     def test(self):
         self.netCD.eval()
         with torch.no_grad():
@@ -66,18 +68,22 @@ class CD(BaseModel):
                 self.pred_cm = self.netCD.module.forward(self.feats_A, self.feats_B)
             else:
                 self.pred_cm = self.netCD(self.feats_A, self.feats_B)
+            l_cd = self.loss_func(self.pred_cm, self.data["L"].long())
+            self.log_dict['l_cd'] = l_cd.item()
         self.netCD.train()
 
-
+    # Get current log
     def get_current_log(self):
         return self.log_dict
 
+    # Get current visuals
     def get_current_visuals(self):
         out_dict = OrderedDict()
         out_dict['pred_cm'] = torch.argmax(self.pred_cm, dim=1, keepdim=False)
         out_dict['gt_cm'] = self.data['L']
         return out_dict
 
+    # Printing the CD network
     def print_network(self):
         s, n = self.get_network_description(self.netCD)
         if isinstance(self.netCD, nn.DataParallel):
@@ -90,12 +96,20 @@ class CD(BaseModel):
             'Change Detection Network structure: {}, with parameters: {:,d}'.format(net_struc_str, n))
         logger.info(s)
 
-    def save_network(self, epoch, iter_step):
+    # Saving the network parameters
+    def save_network(self, epoch, is_best_model = False):
         cd_gen_path = os.path.join(
-            self.opt['path']['checkpoint'], 'CD_I{}_E{}_gen.pth'.format(iter_step, epoch))
+            self.opt['path']['checkpoint'], 'cd_model_E{}_gen.pth'.format(epoch))
         cd_opt_path = os.path.join(
-            self.opt['path']['checkpoint'], 'CD_I{}_E{}_opt.pth'.format(iter_step, epoch))
-        # gen
+            self.opt['path']['checkpoint'], 'cd_model_E{}_opt.pth'.format(epoch))
+        
+        if is_best_model:
+            best_cd_gen_path = os.path.join(
+                self.opt['path']['checkpoint'], 'best_cd_model_gen.pth'.format(epoch))
+            best_cd_opt_path = os.path.join(
+                self.opt['path']['checkpoint'], 'best_cd_model_opt.pth'.format(epoch))
+
+        # Save CD model pareamters
         network = self.netCD
         if isinstance(self.netCD, nn.DataParallel):
             network = network.module
@@ -103,15 +117,26 @@ class CD(BaseModel):
         for key, param in state_dict.items():
             state_dict[key] = param.cpu()
         torch.save(state_dict, cd_gen_path)
-        # opt
+        if is_best_model:
+            torch.save(state_dict, best_cd_gen_path)
+
+
+        # Save CD optimizer paramers
         opt_state = {'epoch': epoch, 'iter': iter_step,
                      'scheduler': None, 'optimizer': None}
         opt_state['optimizer'] = self.optCD.state_dict()
         torch.save(opt_state, cd_opt_path)
+        if is_best_model:
+            torch.save(opt_state, best_cd_opt_path)
 
+        # Print info
         logger.info(
-            'Saved CD model in [{:s}] ...'.format(cd_gen_path))
+            'Saved current CD model in [{:s}] ...'.format(cd_gen_path))
+        if is_best_model:
+            logger.info(
+            'Saved best CD model in [{:s}] ...'.format(best_cd_gen_path))
 
+    # Loading pre-trained CD network
     def load_network(self):
         load_path = self.opt['path_cd']['resume_state']
         if load_path is not None:
@@ -119,15 +144,15 @@ class CD(BaseModel):
                 'Loading pretrained model for CD model [{:s}] ...'.format(load_path))
             gen_path = '{}_gen.pth'.format(load_path)
             opt_path = '{}_opt.pth'.format(load_path)
-            # gen
+            
+            # change detection model
             network = self.netCD
             if isinstance(self.netCD, nn.DataParallel):
                 network = network.module
             network.load_state_dict(torch.load(
                 gen_path), strict=True)
-                
+            
             if self.opt['phase'] == 'train':
-                #optimizer
                 opt = torch.load(opt_path)
                 self.optCD.load_state_dict(opt['optimizer'])
                 self.begin_step = opt['iter']

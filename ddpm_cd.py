@@ -227,12 +227,17 @@ if __name__ == "__main__":
                     })
                 
                 if logs['epoch_acc'] > best_mF1:
+                    is_best_model = True
                     best_mF1 = logs['epoch_acc']
-                    logger.info('Best model updated. Saving models and training states.')
-                    change_detection.save_network(current_epoch, 0)
+                    logger.info('Best model updated. Saving the models (current + best) and training states.')
+                else:
+                    is_best_model = False
+                    logger.info('Saving the current cd model and training states.')
 
-                    if wandb_logger and opt['log_wandb_ckpt']:
-                        wandb_logger.log_checkpoint(current_epoch, 0)
+                change_detection.save_network(current_epoch, is_best_model = is_best_model)
+
+                if wandb_logger and opt['log_wandb_ckpt']:
+                    wandb_logger.log_checkpoint(current_epoch, 0)
                 
                 change_detection._clear_cache()
 
