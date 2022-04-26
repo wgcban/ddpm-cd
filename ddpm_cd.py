@@ -99,7 +99,7 @@ if __name__ == "__main__":
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
-                feats_A, feats_B = diffusion.get_feats(t=2)
+                feats_A, feats_B = diffusion.get_feats(t=np.random.randint(low=2, high=500))
 
                 # Feeding features from the diffusion model to the CD model
                 change_detection.feed_data(feats_A, feats_B, train_data)
