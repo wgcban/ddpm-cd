@@ -2,7 +2,7 @@
     "name": "ddpm-RS-CDHead",
     "phase": "train", // train or val
     "gpu_ids": [
-        8
+        2
     ],
 
     "path": { //set the paths
@@ -11,7 +11,7 @@
         "results": "results",
         "checkpoint": "checkpoint",
         //"resume_state": null
-        "resume_state": "experiments/ddpm-RS-Unet_220425_062858/checkpoint/I10000_E2" //set path to pre-trained diffusion model
+        "resume_state": "experiments/ddpm-RS-Unet_220425_062858/checkpoint/I30000_E4" //set path to pre-trained diffusion model
     },
 
     "path_cd": { //set the path 
@@ -26,7 +26,7 @@
     "datasets": {
         "train": {
             "name": "LEVIR-CD-256",
-            "dataroot": "dataset/LEVIR-CD-256/",
+            "dataroot": "dataset/LEVIR-CD256/",
             "resolution": 256, // high resolution
             "batch_size": 4,
             "num_workers": 8,
@@ -35,8 +35,12 @@
         },
         "val": {
             "name": "LEVIR-CD-256",
-            "resolution": 256,
-            "data_len": 3
+            "dataroot": "dataset/LEVIR-CD256/",
+            "resolution": 256, // high resolution
+            "batch_size": 4,
+            "num_workers": 8,
+            "use_shuffle": false,
+            "data_len": -1 // -1 represents all data used in train
         }
     },
 
@@ -91,9 +95,9 @@
     
     "train": {
         "n_epoch": 80,
+        "train_print_freq": 500,
         "val_freq": 1,
-        "save_checkpoint_freq": 1,
-        "print_freq": 100,
+        "val_print_freq": 100,
         "optimizer": {
             "type": "adam",
             "lr": 1e-4

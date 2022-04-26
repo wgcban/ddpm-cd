@@ -44,7 +44,10 @@ class cd_head(nn.Module):
         # Convolutional layers before parsing to difference head
         self.diff_layers = nn.ModuleList()
         for feat in feat_scales:
-            self.diff_layers.append(nn.Conv2d(get_in_channels([feat]), get_in_channels([feat]), kernel_size=3, padding=1))
+            self.diff_layers.append(nn.Conv2d(  in_channels=get_in_channels([feat], inner_channel, channel_multiplier), 
+                                                out_channels=get_in_channels([feat], inner_channel, channel_multiplier), 
+                                                kernel_size=3, 
+                                                padding=1))
 
         #MLP layer to reduce the feature dimention
         self.conv1_final = nn.Conv2d(self.in_channels, 64, kernel_size=1, padding=0)

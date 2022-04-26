@@ -6,7 +6,7 @@ import torch.nn as nn
 import os
 import model.networks as networks
 from .base_model import BaseModel
-from misc.metric_tool import ConfuseMatrixMeter
+from misc.metric_tools import ConfuseMatrixMeter
 logger = logging.getLogger('base')
 
 
@@ -148,7 +148,7 @@ class CD(BaseModel):
     
     def _collect_running_batch_states(self):
         self.running_acc = self._update_metric()
-        self.log_dict['running_acc'] = running_acc.item()
+        self.log_dict['running_acc'] = self.running_acc.item()
 
 
     def _collect_epoch_states(self):

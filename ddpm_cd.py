@@ -52,58 +52,62 @@ if __name__ == "__main__":
     else:
         wandb_logger = None
 
-    # dataset
+    # Loading change-detction datasets.
     for phase, dataset_opt in opt['datasets'].items():
         if phase == 'train' and args.phase != 'val':
-            print("Creating train dataloader.")
+            print("Creating [train] change-detection dataloader.")
             train_set   = Data.create_cd_dataset(dataset_opt, phase)
             train_loader= Data.create_dataloader(
                 train_set, dataset_opt, phase)
             opt['len_train_dataloader'] = len(train_loader)
 
         elif phase == 'val':
-            val_set   = Data.create_cd_dataset(dataset_opt, 'val')
-            val_loader= Data.create_dataloader(
-                train_set, dataset_opt, 'val')
+            print("Creating [val] change-detection dataloader.")
+            val_set   = Data.create_cd_dataset(dataset_opt, phase)
+            val_loader= Data.create_cd_dataloader(
+                val_set, dataset_opt, phase)
             opt['len_val_dataloader'] = len(val_loader)
-    
     logger.info('Initial Dataset Finished')
 
-
-    # diffusion model
+    # Loading diffusion model
     diffusion = Model.create_model(opt)
     logger.info('Initial Diffusion Model Finished')
 
-    #Set noise schedule
+    # Set noise schedule for the diffusion model
     diffusion.set_new_noise_schedule(
         opt['model']['beta_schedule'][opt['phase']], schedule_phase=opt['phase'])
     
-    # CD model
+    # Creating change-detection model
     change_detection = Model.create_CD_model(opt)
     
-    # Training loop
+    #################
+    # Training loop #
+    #################
     n_epoch = opt['train']['n_epoch']
-
-    # best mF1
     best_mF1 = 0.0
-
+    start_epoch = 0
     if opt['phase'] == 'train':
         for current_epoch in range(start_epoch, n_epoch):         
             change_detection._clear_cache()
+            train_result_path = '{}/train/{}'.format(opt['path']
+                                                 ['results'], current_epoch)
+            os.makedirs(train_result_path, exist_ok=True)
             
-            ### train epoch ###
+            ################
+            ### training ###
+            ################
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
                 feats_A, feats_B = diffusion.get_feats(t=2)
 
                 # Feeding features from the diffusion model to the CD model
-                change_detection.feed_data(feats_A.detach(), feats_B.detacth(), train_data)
+                change_detection.feed_data(feats_A, feats_B, train_data)
                 change_detection.optimize_parameters()
                 change_detection._collect_running_batch_states()
 
                 # log running batch status
-                if current_epoch % opt['train']['print_itter_freq'] == 0:
+                if current_step % opt['train']['train_print_freq'] == 0:
                     # message
                     logs = change_detection.get_current_log()
                     message = '[Training CD]. epoch: [%d/%d]. Itter: [%d/%d], CD_loss: %.5f, running_mf1: %.5f\n' %\
@@ -113,28 +117,47 @@ if __name__ == "__main__":
                     #vissuals
                     visuals = change_detection.get_current_visuals()
 
+                    # Converting to uint8
+                    img_A   = Metrics.tensor2img(train_data['A'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                    img_B   = Metrics.tensor2img(train_data['B'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                    gt_cm   = Metrics.tensor2img(visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
+                    pred_cm = Metrics.tensor2img(visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
 
-                # Uncommet the following line to visualize features from the diffusion model
-                # print_feats(opt, train_data, level=3)
+                    #save imgs
+                    Metrics.save_img(
+                        img_A, '{}/img_A_b{}.png'.format(train_result_path, current_step))
+                    Metrics.save_img(
+                        img_B, '{}/img_B_b{}.png'.format(train_result_path, current_step))
+                    Metrics.save_img(
+                        pred_cm, '{}/pred_b{}.png'.format(train_result_path, current_step))
+                    Metrics.save_img(
+                        gt_cm, '{}/gt_b{}.png'.format(train_result_path, current_step))
+
+
+                    # Uncommet the following line to visualize features from the diffusion model
+                    # print_feats(opt, train_data, level=3)
                 
             ### log epoch status ###
             change_detection._collect_epoch_states()
             logs = change_detection.get_current_log()
-            message = '[Training CD]. epoch: [%d/%d]. epoch_mF1=%.5f'.format(
-                current_epoch, n_epoch-1, logs['epoch_acc'])
+            message = '[Training CD (epoch summary)]: epoch: [%d/%d]. epoch_mF1=%.5f \n' %\
+                      (current_epoch, n_epoch-1, logs['epoch_acc'])
             for k, v in logs.items():
                 message += '{:s}: {:.4e} '.format(k, v)
                 tb_logger.add_scalar(k, v, current_step)
+            message += '\n'
             logger.info(message)
 
             if wandb_logger:
                 wandb_logger.log_metrics(logs)
 
             change_detection._clear_cache()
-                
+            
+            ##################
             ### validation ###
+            ##################
             if current_epoch % opt['train']['val_freq'] == 0:
-                val_result_path = '{}/Val/{}'.format(opt['path']
+                val_result_path = '{}/val/{}'.format(opt['path']
                                                  ['results'], current_epoch)
                 os.makedirs(val_result_path, exist_ok=True)
 
@@ -144,25 +167,25 @@ if __name__ == "__main__":
                     feats_A, feats_B = diffusion.get_feats(t=2)
 
                     # Feed data to CD model
-                    change_detection.feed_data(feats_A.detach(), feats_B.detacth(), val_data)
+                    change_detection.feed_data(feats_A, feats_B, val_data)
                     change_detection.test()
                     change_detection._collect_running_batch_states()
                     
                     # log running batch status for val data
-                    if current_step % opt['train']['print_itter_freq'] == 0:
+                    if current_step % opt['train']['val_print_freq'] == 0:
                         # message
                         logs        = change_detection.get_current_log()
                         logger_val  = logging.getLogger('val')  # validation logger
-                        message     = '[Validation CD]. epoch: [%d/%d]. Itter: [%d/%d], CD_loss: %.5f, running_mf1: %.5f\n' %\
-                                    (current_epoch, n_epoch-1, current_step, len(train_loader), logs['l_cd'], logs['running_acc'])
+                        message     = '[Validation CD]. epoch: [%d/%d]. Itter: [%d/%d], running_mf1: %.5f\n' %\
+                                    (current_epoch, n_epoch-1, current_step, len(val_loader), logs['running_acc'])
                         logger_val.info(message)
 
                         #vissuals
                         visuals = change_detection.get_current_visuals()
 
                         # Converting to uint8
-                        img_A   = Metrics.tensor2img(train_data['A'], out_type=np.uint8, min_max=(-1, 1))  # uint8
-                        img_B   = Metrics.tensor2img(train_data['B'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                        img_A   = Metrics.tensor2img(val_data['A'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                        img_B   = Metrics.tensor2img(val_data['B'], out_type=np.uint8, min_max=(-1, 1))  # uint8
                         gt_cm   = Metrics.tensor2img(visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
                         pred_cm = Metrics.tensor2img(visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
 
@@ -189,11 +212,12 @@ if __name__ == "__main__":
 
                 change_detection._collect_epoch_states()
                 logs     = change_detection.get_current_log()
-                message = '[Validation CD]. epoch: [%d/%d]. epoch_mF1=%.5f'.format(
-                    current_epoch, n_epoch-1, logs['epoch_acc'])
+                message = '[Validation CD (epoch summary)]: epoch: [%d/%d]. epoch_mF1=%.5f \n' %\
+                      (current_epoch, n_epoch-1, logs['epoch_acc'])
                 for k, v in logs.items():
                     message += '{:s}: {:.4e} '.format(k, v)
                     tb_logger.add_scalar(k, v, current_step)
+                message += '\n'
                 logger.info(message)
 
                 if wandb_logger:
@@ -211,6 +235,8 @@ if __name__ == "__main__":
                         wandb_logger.log_checkpoint(current_epoch, 0)
                 
                 change_detection._clear_cache()
+
+                val_step += 1
 
             if wandb_logger:
                 wandb_logger.log_metrics({'epoch': current_epoch-1})

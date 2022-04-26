@@ -125,8 +125,8 @@ def define_CD(opt):
     # Define change detection network head
     netCD = cd_head(feat_scales=cd_model_opt['feat_scales'], 
                     out_channels=cd_model_opt['out_channels'], 
-                    inner_channel=diffusion_model_opt['inner_channel'], 
-                    channel_multiplier=diffusion_model_opt['channel_multiplier'],
+                    inner_channel=diffusion_model_opt['unet']['inner_channel'], 
+                    channel_multiplier=diffusion_model_opt['unet']['channel_multiplier'],
                     img_size=cd_model_opt['output_cm_size'])
     
     # Initialize the change detection head if it is 'train' phase 

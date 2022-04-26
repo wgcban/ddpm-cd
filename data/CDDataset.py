@@ -45,6 +45,7 @@ class CDDataset(Dataset):
         self.split = split  #train | val | test
         
         self.list_path = os.path.join(self.root_dir, LIST_FOLDER_NAME, self.split+'.txt')
+        
         self.img_name_list = load_img_name_list(self.list_path)
 
         self.dataset_len = len(self.img_name_list)

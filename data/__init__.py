@@ -20,6 +20,20 @@ def create_dataloader(dataset, dataset_opt, phase):
         raise NotImplementedError(
             'Dataloader [{:s}] is not found.'.format(phase))
 
+#Create CD dataloader
+def create_cd_dataloader(dataset, dataset_opt, phase):
+    '''create dataloader '''
+    if phase == 'train' or 'val':
+        return torch.utils.data.DataLoader(
+            dataset,
+            batch_size=dataset_opt['batch_size'],
+            shuffle=dataset_opt['use_shuffle'],
+            num_workers=dataset_opt['num_workers'],
+            pin_memory=True)
+    else:
+        raise NotImplementedError(
+            'Dataloader [{:s}] is not found.'.format(phase))
+
 # Create image dataset
 def create_image_dataset(dataset_opt, phase):
     '''create dataset'''
@@ -46,6 +60,7 @@ def create_cd_dataset(dataset_opt, phase):
                 data_len=dataset_opt['data_len']
                 )
     logger = logging.getLogger('base')
-    logger.info('Dataset [{:s} - {:s}] is created.'.format(dataset.__class__.__name__,
-                                                           dataset_opt['name']))
+    logger.info('Dataset [{:s} - {:s} - {:s}] is created.'.format(dataset.__class__.__name__,
+                                                           dataset_opt['name'],
+                                                           phase))
     return dataset

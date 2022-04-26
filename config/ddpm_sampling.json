@@ -25,7 +25,7 @@
         "val": {
             "name": "LEVIR-CD-256",
             "resolution": 256,
-            "data_len": 20
+            "data_len": 3
         }
     },
     "model": {
