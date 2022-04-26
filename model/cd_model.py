@@ -163,19 +163,18 @@ class CD(BaseModel):
         """
         update metric
         """
-        target = self.data['L'].detach()
         G_pred = self.pred_cm.detach()
-
         G_pred = torch.argmax(G_pred, dim=1)
 
-        current_score = self.running_metric.update_cm(pr=G_pred.cpu().numpy(), gt=target.cpu().numpy())
+        current_score = self.running_metric.update_cm(pr=G_pred.cpu().numpy(), gt=self.data['L'].detach().cpu().numpy())
         return current_score
     
+    # Collecting status of the current running batch
     def _collect_running_batch_states(self):
         self.running_acc = self._update_metric()
         self.log_dict['running_acc'] = self.running_acc.item()
 
-
+    # Collect the status of the epoch
     def _collect_epoch_states(self):
         scores = self.running_metric.get_scores()
         self.epoch_acc = scores['mf1']
@@ -185,7 +184,7 @@ class CD(BaseModel):
             self.log_dict[k] = v
             #message += '%s: %.5f ' % (k, v)
 
-    
+    # Rest all the performance metrics
     def _clear_cache(self):
         self.running_metric.clear()
         
