@@ -99,7 +99,7 @@ if __name__ == "__main__":
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
-                feats_A, feats_B = diffusion.get_feats(t=np.random.randint(low=2, high=500))
+                feats_A, feats_B = diffusion.get_feats(t=np.random.randint(low=2, high=300))
 
                 # Feeding features from the diffusion model to the CD model
                 change_detection.feed_data(feats_A, feats_B, train_data)
@@ -164,7 +164,7 @@ if __name__ == "__main__":
                 for current_step, val_data in enumerate(val_loader):
                     # Feed data to diffusion model
                     diffusion.feed_data(val_data)
-                    feats_A, feats_B = diffusion.get_feats(t=2)
+                    feats_A, feats_B = diffusion.get_feats(t=5)
 
                     # Feed data to CD model
                     change_detection.feed_data(feats_A, feats_B, val_data)
@@ -241,10 +241,9 @@ if __name__ == "__main__":
                 
                 change_detection._clear_cache()
 
-                val_step += 1
-
             if wandb_logger:
                 wandb_logger.log_metrics({'epoch': current_epoch-1})
+                val_step += 1
 
         # save model
         logger.info('End of training.')

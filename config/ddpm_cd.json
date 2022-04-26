@@ -99,8 +99,8 @@
         "val_freq": 1,
         "val_print_freq": 50,
         "optimizer": {
-            "type": "adamw",
-            "lr": 1e-5
+            "type": "adam",
+            "lr": 1e-4
         }
     },
     "wandb": {

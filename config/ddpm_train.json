@@ -15,8 +15,8 @@
     },
     "datasets": {
         "train": {
-            "name": "LEVIR-WHU-DSIFN",
-            "dataroot": "dataset/LEVIR-WHU-DSIFN",
+            "name": "Million-AID", //"LEVIR-WHU-DSIFN",
+            "dataroot": "dataset/Million-AID", //"dataset/LEVIR-WHU-DSIFN",
             "resolution": 256, // high resolution
             "batch_size": 8,
             "num_workers": 8,
@@ -24,7 +24,7 @@
             "data_len": -1 // -1 represents all data used in train
         },
         "val": {
-            "name": "LEVIR-CD-256",
+            "name": "Million-AID", //"LEVIR-CD-256",
             "resolution": 256,
             "data_len": 3
         }
@@ -51,13 +51,13 @@
         },
         "beta_schedule": { // use munual beta_schedule for acceleration
             "train": {
-                "schedule": "linear",
+                "schedule": "cosine",
                 "n_timestep": 2000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2
             },
             "val": {
-                "schedule": "linear",
+                "schedule": "cosine",
                 "n_timestep": 2000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2
@@ -76,7 +76,7 @@
         "save_checkpoint_freq": 1e4,
         "print_freq": 100,
         "optimizer": {
-            "type": "adam",
+            "type": "adamw",
             "lr": 1e-5
         },
         "ema_scheduler": { // not used now

@@ -122,8 +122,9 @@ class CD(BaseModel):
 
 
         # Save CD optimizer paramers
-        opt_state = {'epoch': epoch, 'iter': iter_step,
-                     'scheduler': None, 'optimizer': None}
+        opt_state = {'epoch': epoch,
+                     'scheduler': None, 
+                     'optimizer': None}
         opt_state['optimizer'] = self.optCD.state_dict()
         torch.save(opt_state, cd_opt_path)
         if is_best_model:
