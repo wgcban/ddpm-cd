@@ -1,6 +1,6 @@
 {
     "name": "ddpm-RS-Unet",
-    "phase": "train", // train or val
+    "phase": "train", // train (train+val) or test
     "distributed": true,
     "gpu_ids": [
         1

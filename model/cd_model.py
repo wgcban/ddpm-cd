@@ -38,6 +38,10 @@ class CD(BaseModel):
                 raise NotImplementedError(
                     'Optimizer [{:s}] not implemented'.format(opt['train']["optimizer"]["type"]))
             self.log_dict = OrderedDict()
+        else:
+            self.netCD.eval()
+            self.log_dict = OrderedDict()
+
         self.load_network()
         self.print_network()
 

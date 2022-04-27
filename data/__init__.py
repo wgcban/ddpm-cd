@@ -23,7 +23,7 @@ def create_dataloader(dataset, dataset_opt, phase):
 #Create CD dataloader
 def create_cd_dataloader(dataset, dataset_opt, phase):
     '''create dataloader '''
-    if phase == 'train' or 'val':
+    if phase == 'train' or 'val' or 'test':
         return torch.utils.data.DataLoader(
             dataset,
             batch_size=dataset_opt['batch_size'],

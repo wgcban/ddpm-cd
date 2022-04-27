@@ -15,12 +15,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', type=str, default='config/ddpm_cd.json',
                         help='JSON file for configuration')
-    parser.add_argument('-p', '--phase', type=str, choices=['train', 'val'],
-                        help='Run either train(training) or val(generation)', default='train')
+    parser.add_argument('-p', '--phase', type=str, choices=['train', 'test'],
+                        help='Run either train(training + validation) or testing', default='train')
     parser.add_argument('-gpu', '--gpu_ids', type=str, default=None)
     parser.add_argument('-debug', '-d', action='store_true')
     parser.add_argument('-enable_wandb', action='store_true')
-    parser.add_argument('-log_wandb_ckpt', action='store_false')
     parser.add_argument('-log_eval', action='store_true')
 
     # parse configs
@@ -35,7 +34,7 @@ if __name__ == "__main__":
 
     Logger.setup_logger(None, opt['path']['log'],
                         'train', level=logging.INFO, screen=True)
-    Logger.setup_logger('val', opt['path']['log'], 'val', level=logging.INFO)
+    Logger.setup_logger('test', opt['path']['log'], 'test', level=logging.INFO)
     logger = logging.getLogger('base')
     logger.info(Logger.dict2str(opt))
     tb_logger = SummaryWriter(log_dir=opt['path']['tb_logger'])
@@ -54,19 +53,28 @@ if __name__ == "__main__":
 
     # Loading change-detction datasets.
     for phase, dataset_opt in opt['datasets'].items():
-        if phase == 'train' and args.phase != 'val':
+        if phase == 'train' and args.phase != 'test':
             print("Creating [train] change-detection dataloader.")
             train_set   = Data.create_cd_dataset(dataset_opt, phase)
             train_loader= Data.create_dataloader(
                 train_set, dataset_opt, phase)
             opt['len_train_dataloader'] = len(train_loader)
 
-        elif phase == 'val':
+        elif phase == 'val' and args.phase != 'test':
             print("Creating [val] change-detection dataloader.")
             val_set   = Data.create_cd_dataset(dataset_opt, phase)
             val_loader= Data.create_cd_dataloader(
                 val_set, dataset_opt, phase)
             opt['len_val_dataloader'] = len(val_loader)
+        
+        elif phase == 'test' and args.phase == 'test':
+            print("Creating [test] change-detection dataloader.")
+            print(phase)
+            test_set   = Data.create_cd_dataset(dataset_opt, phase)
+            test_loader= Data.create_cd_dataloader(
+                test_set, dataset_opt, phase)
+            opt['len_test_dataloader'] = len(test_loader)
+    
     logger.info('Initial Dataset Finished')
 
     # Loading diffusion model
@@ -99,7 +107,7 @@ if __name__ == "__main__":
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
-                feats_A, feats_B = diffusion.get_feats(t=np.random.randint(low=2, high=300))
+                feats_A, feats_B = diffusion.get_feats(t=np.random.randint(low=2, high=50))
 
                 # Feeding features from the diffusion model to the CD model
                 change_detection.feed_data(feats_A, feats_B, train_data)
@@ -117,21 +125,35 @@ if __name__ == "__main__":
                     #vissuals
                     visuals = change_detection.get_current_visuals()
 
-                    # Converting to uint8
-                    img_A   = Metrics.tensor2img(train_data['A'], out_type=np.uint8, min_max=(-1, 1))  # uint8
-                    img_B   = Metrics.tensor2img(train_data['B'], out_type=np.uint8, min_max=(-1, 1))  # uint8
-                    gt_cm   = Metrics.tensor2img(visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
-                    pred_cm = Metrics.tensor2img(visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
+                    img_mode = "grid"
+                    if img_mode == "single":
+                        # Converting to uint8
+                        img_A   = Metrics.tensor2img(train_data['A'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                        img_B   = Metrics.tensor2img(train_data['B'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                        gt_cm   = Metrics.tensor2img(visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
+                        pred_cm = Metrics.tensor2img(visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
 
-                    #save imgs
-                    Metrics.save_img(
-                        img_A, '{}/img_A_b{}.png'.format(train_result_path, current_step))
-                    Metrics.save_img(
-                        img_B, '{}/img_B_b{}.png'.format(train_result_path, current_step))
-                    Metrics.save_img(
-                        pred_cm, '{}/pred_b{}.png'.format(train_result_path, current_step))
-                    Metrics.save_img(
-                        gt_cm, '{}/gt_b{}.png'.format(train_result_path, current_step))
+                        #save imgs
+                        Metrics.save_img(
+                                img_A, '{}/img_A_e{}_b{}.png'.format(train_result_path, current_epoch, current_step))
+                        Metrics.save_img(
+                                img_B, '{}/img_B_e{}_b{}.png'.format(train_result_path, current_epoch, current_step))
+                        Metrics.save_img(
+                                pred_cm, '{}/img_pred_e{}_b{}.png'.format(train_result_path, current_epoch, current_step))
+                        Metrics.save_img(
+                                gt_cm, '{}/img_gt_e{}_b{}.png'.format(train_result_path, current_epoch, current_step))
+                    else:
+                        # grid img
+                        visuals['pred_cm'] = visuals['pred_cm']*2.0-1.0
+                        visuals['gt_cm'] = visuals['gt_cm']*2.0-1.0
+                        grid_img = torch.cat((  train_data['A'], 
+                                    train_data['B'], 
+                                    visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), 
+                                    visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1)),
+                                    dim = 0)
+                        grid_img = Metrics.tensor2img(grid_img)  # uint8
+                        Metrics.save_img(
+                            grid_img, '{}/img_A_B_pred_gt_e{}_b{}.png'.format(train_result_path, current_epoch, current_step))
 
 
                     # Uncommet the following line to visualize features from the diffusion model
@@ -147,9 +169,18 @@ if __name__ == "__main__":
                 tb_logger.add_scalar(k, v, current_step)
             message += '\n'
             logger.info(message)
-
+            
             if wandb_logger:
-                wandb_logger.log_metrics(logs)
+                    wandb_logger.log_metrics({
+                        'training/mF1': logs['epoch_acc'],
+                        'training/mIoU': logs['miou'],
+                        'training/OA': logs['acc'],
+                        'training/change-F1': logs['F1_1'],
+                        'training/no-change-F1': logs['F1_0'],
+                        'training/change-IoU': logs['iou_1'],
+                        'training/no-change-IoU': logs['iou_0'],
+                        'training/train_epoch': current_epoch
+                    })
 
             change_detection._clear_cache()
             
@@ -175,40 +206,42 @@ if __name__ == "__main__":
                     if current_step % opt['train']['val_print_freq'] == 0:
                         # message
                         logs        = change_detection.get_current_log()
-                        logger_val  = logging.getLogger('val')  # validation logger
                         message     = '[Validation CD]. epoch: [%d/%d]. Itter: [%d/%d], running_mf1: %.5f\n' %\
                                     (current_epoch, n_epoch-1, current_step, len(val_loader), logs['running_acc'])
-                        logger_val.info(message)
+                        logger.info(message)
 
                         #vissuals
                         visuals = change_detection.get_current_visuals()
 
-                        # Converting to uint8
-                        img_A   = Metrics.tensor2img(val_data['A'], out_type=np.uint8, min_max=(-1, 1))  # uint8
-                        img_B   = Metrics.tensor2img(val_data['B'], out_type=np.uint8, min_max=(-1, 1))  # uint8
-                        gt_cm   = Metrics.tensor2img(visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
-                        pred_cm = Metrics.tensor2img(visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
+                        img_mode = "grid"
+                        if img_mode == "single":
+                            # Converting to uint8
+                            img_A   = Metrics.tensor2img(val_data['A'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                            img_B   = Metrics.tensor2img(val_data['B'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                            gt_cm   = Metrics.tensor2img(visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
+                            pred_cm = Metrics.tensor2img(visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
 
-                        #save imgs
-                        Metrics.save_img(
-                            img_A, '{}/img_A_e{}_b{}.png'.format(val_result_path, current_epoch, current_step))
-                        Metrics.save_img(
-                            img_B, '{}/img_B_e{}_b{}.png'.format(val_result_path, current_epoch, current_step))
-                        Metrics.save_img(
-                            pred_cm, '{}/pred_e{}_b{}.png'.format(val_result_path, current_epoch, current_step))
-                        Metrics.save_img(
-                            gt_cm, '{}/gt_e{}_b{}.png'.format(val_result_path, current_epoch, current_step))
-                        
-                        tb_logger.add_image(
-                            'Iter_{}'.format(current_epoch),
-                            np.transpose(np.concatenate((img_A, img_B, pred_cm, gt_cm), axis=1), [2, 0, 1]), 
-                            current_step)
-
-                        if wandb_logger:
-                            wandb_logger.log_image(
-                                f'validation_{current_step}', 
-                                    np.concatenate((img_A, img_B, pred_cm, gt_cm), axis=1)
-                                )
+                            #save imgs
+                            Metrics.save_img(
+                                img_A, '{}/img_A_e{}_b{}.png'.format(val_result_path, current_epoch, current_step))
+                            Metrics.save_img(
+                                img_B, '{}/img_B_e{}_b{}.png'.format(val_result_path, current_epoch, current_step))
+                            Metrics.save_img(
+                                pred_cm, '{}/img_pred_e{}_b{}.png'.format(val_result_path, current_epoch, current_step))
+                            Metrics.save_img(
+                                gt_cm, '{}/img_gt_e{}_b{}.png'.format(val_result_path, current_epoch, current_step))
+                        else:
+                            # grid img
+                            visuals['pred_cm'] = visuals['pred_cm']*2.0-1.0
+                            visuals['gt_cm'] = visuals['gt_cm']*2.0-1.0
+                            grid_img = torch.cat((  val_data['A'], 
+                                        val_data['B'], 
+                                        visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), 
+                                        visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1)),
+                                        dim = 0)
+                            grid_img = Metrics.tensor2img(grid_img)  # uint8
+                            Metrics.save_img(
+                            grid_img, '{}/img_A_B_pred_gt_e{}_b{}.png'.format(val_result_path, current_epoch, current_step))
 
                 change_detection._collect_epoch_states()
                 logs     = change_detection.get_current_log()
@@ -223,6 +256,12 @@ if __name__ == "__main__":
                 if wandb_logger:
                     wandb_logger.log_metrics({
                         'validation/mF1': logs['epoch_acc'],
+                        'validation/mIoU': logs['miou'],
+                        'validation/OA': logs['acc'],
+                        'validation/change-F1': logs['F1_1'],
+                        'validation/no-change-F1': logs['F1_0'],
+                        'validation/change-IoU': logs['iou_1'],
+                        'validation/no-change-IoU': logs['iou_0'],
                         'validation/val_epoch': current_epoch
                     })
                 
@@ -235,50 +274,74 @@ if __name__ == "__main__":
                     logger.info('Saving the current cd model and training states.')
 
                 change_detection.save_network(current_epoch, is_best_model = is_best_model)
-
-                if wandb_logger and opt['log_wandb_ckpt']:
-                    wandb_logger.log_checkpoint(current_epoch, 0)
-                
                 change_detection._clear_cache()
 
             if wandb_logger:
                 wandb_logger.log_metrics({'epoch': current_epoch-1})
                 val_step += 1
-
-        # save model
         logger.info('End of training.')
     else:
-        logger.info('Begin Model Evaluation.')
-        result_path = '{}'.format(opt['path']['results'])
-        os.makedirs(result_path, exist_ok=True)
-        for idx in range(0, opt['datasets']['val']['data_len']):
-            diffusion.test(in_channels=opt['model']['unet']['in_channel'], img_size=opt['datasets']['val']['resolution'], continous=True)
-            visuals = diffusion.get_current_visuals()
+        logger.info('Begin Model Evaluation (testing).')
+        test_result_path = '{}/test/'.format(opt['path']
+                                                 ['results'])
+        os.makedirs(test_result_path, exist_ok=True)
+        logger_test = logging.getLogger('test')  # test logger
+        change_detection._clear_cache()
+        for current_step, test_data in enumerate(test_loader):
+            # Feed data to diffusion model
+            diffusion.feed_data(test_data)
+            feats_A, feats_B = diffusion.get_feats(t=5)
 
+            # Feed data to CD model
+            change_detection.feed_data(feats_A, feats_B, test_data)
+            change_detection.test()
+            change_detection._collect_running_batch_states()
+
+            # Logs
+            logs        = change_detection.get_current_log()
+            message     = '[Testing CD]. Itter: [%d/%d], running_mf1: %.5f\n' %\
+                                    (current_step, len(test_loader), logs['running_acc'])
+            logger_test.info(message)
+
+            # Vissuals
+            visuals = change_detection.get_current_visuals()
             img_mode = 'grid'
             if img_mode == 'single':
+                # Converting to uint8
+                img_A   = Metrics.tensor2img(test_data['A'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                img_B   = Metrics.tensor2img(test_data['B'], out_type=np.uint8, min_max=(-1, 1))  # uint8
+                gt_cm   = Metrics.tensor2img(visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
+                pred_cm = Metrics.tensor2img(visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
 
-                # single img series
-                sam_img = visuals['SAM']
-                sample_num = sam_img.shape[0]
-                for iter in range(0, sample_num):
-                    Metrics.save_img(
-                        Metrics.tensor2img(sam_img[iter]), '{}/{}_{}_sr_{}.png'.format(result_path, current_step, idx, iter))
+                # Save imgs
+                Metrics.save_img(
+                    img_A, '{}/img_A_{}.png'.format(test_result_path, current_step))
+                Metrics.save_img(
+                    img_B, '{}/img_B_{}.png'.format(test_result_path, current_step))
+                Metrics.save_img(
+                    pred_cm, '{}/img_pred_{}.png'.format(test_result_path, current_step))
+                Metrics.save_img(
+                    gt_cm, '{}/img_gt_{}.png'.format(test_result_path, current_step))
             else:
                 # grid img
-                sam_img = Metrics.tensor2img(visuals['SAM'])  # uint8
+                visuals['pred_cm'] = visuals['pred_cm']*2.0-1.0
+                visuals['gt_cm'] = visuals['gt_cm']*2.0-1.0
+                grid_img = torch.cat((  test_data['A'], 
+                                        test_data['B'], 
+                                        visuals['pred_cm'].unsqueeze(1).repeat(1, 3, 1, 1), 
+                                        visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1)),
+                                        dim = 0)
+                grid_img = Metrics.tensor2img(grid_img)  # uint8
                 Metrics.save_img(
-                    sam_img, '{}/sampling_process_{}_{}.png'.format(result_path, current_step, idx))
-                Metrics.save_img(
-                    Metrics.tensor2img(visuals['SAM'][-1]), '{}/sample_{}_{}.png'.format(result_path, current_step, idx))
+                    grid_img, '{}/img_A_B_pred_gt_{}.png'.format(test_result_path, current_step))
 
-            if wandb_logger and opt['log_eval']:
-                wandb_logger.log_eval_data(sam=Metrics.tensor2img(visuals['SAM'][-1]))
+        change_detection._collect_epoch_states()
+        logs = change_detection.get_current_log()
+        message = '[Test CD summary]: Test mF1=%.5f \n' %\
+                      (logs['epoch_acc'])
+        for k, v in logs.items():
+            message += '{:s}: {:.4e} '.format(k, v)
+            message += '\n'
+        logger_test.info(message)
 
-        logger_val = logging.getLogger('val')  # validation logger
-        logger_val.info('<epoch:{:3d}, iter:{:8,d}> Sample generation completed.'.format(
-            current_epoch, current_step))
-
-        if wandb_logger:
-            if opt['log_eval']:
-                wandb_logger.log_eval_table()
+        logger.info('End of testing...')
