@@ -110,6 +110,8 @@ if __name__ == "__main__":
             ################
             ### training ###
             ################
+            message = 'lr: %0.7f\n \n' % change_detection.optCD.param_groups[0]['lr']
+            logger.info(message)
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
@@ -275,10 +277,11 @@ if __name__ == "__main__":
                 if logs['epoch_acc'] > best_mF1:
                     is_best_model = True
                     best_mF1 = logs['epoch_acc']
-                    logger.info('Best model updated. Saving the models (current + best) and training states.')
+                    logger.info('[Validation CD] Best model updated. Saving the models (current + best) and training states.')
                 else:
                     is_best_model = False
-                    logger.info('Saving the current cd model and training states.')
+                    logger.info('[Validation CD]Saving the current cd model and training states.')
+                logger.info('--- Proceed To The Next Epoch ----\n \n')
 
                 change_detection.save_network(current_epoch, is_best_model = is_best_model)
                 change_detection._clear_cache()
