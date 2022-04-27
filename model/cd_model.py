@@ -7,6 +7,7 @@ import os
 import model.networks as networks
 from .base_model import BaseModel
 from misc.metric_tools import ConfuseMatrixMeter
+from misc.torchutils import get_scheduler
 logger = logging.getLogger('base')
 
 
@@ -48,6 +49,9 @@ class CD(BaseModel):
         self.running_metric = ConfuseMatrixMeter(n_class=opt['model_cd']['out_channels'])
         self.len_train_dataloader = opt["len_train_dataloader"]
         self.len_val_dataloader = opt["len_val_dataloader"]
+
+        #Define learning rate sheduler
+        self.exp_lr_scheduler_netCD = get_scheduler(optimizer=self.optCD, args=opt['train'])
 
     # Feeding all data to the CD model
     def feed_data(self, feats_A, feats_B, data):
@@ -192,4 +196,9 @@ class CD(BaseModel):
     # Rest all the performance metrics
     def _clear_cache(self):
         self.running_metric.clear()
+
+    # Finctions related to learning rate sheduler
+    def _update_lr_schedulers(self):
+        self.exp_lr_scheduler_netCD.step()
+
         

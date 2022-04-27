@@ -44,9 +44,15 @@ if __name__ == "__main__":
         import wandb
         print("Initializing wandblog.")
         wandb_logger = WandbLogger(opt)
-        wandb.define_metric('validation/val_step')
+        # Training log
         wandb.define_metric('epoch')
+        wandb.define_metric('training/train_step')
+        wandb.define_metric("training/*", step_metric="train_step")
+        # Validation log
+        wandb.define_metric('validation/val_step')
         wandb.define_metric("validation/*", step_metric="val_step")
+        # Initialization
+        train_step = 0
         val_step = 0
     else:
         wandb_logger = None
@@ -107,7 +113,7 @@ if __name__ == "__main__":
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
-                feats_A, feats_B = diffusion.get_feats(t=np.random.randint(low=2, high=50))
+                feats_A, feats_B = diffusion.get_feats(t=np.random.randint(low=2, high=8))
 
                 # Feeding features from the diffusion model to the CD model
                 change_detection.feed_data(feats_A, feats_B, train_data)
@@ -179,10 +185,11 @@ if __name__ == "__main__":
                         'training/no-change-F1': logs['F1_0'],
                         'training/change-IoU': logs['iou_1'],
                         'training/no-change-IoU': logs['iou_0'],
-                        'training/train_epoch': current_epoch
+                        'training/train_step': current_epoch
                     })
 
             change_detection._clear_cache()
+            change_detection._update_lr_schedulers()
             
             ##################
             ### validation ###
@@ -262,7 +269,7 @@ if __name__ == "__main__":
                         'validation/no-change-F1': logs['F1_0'],
                         'validation/change-IoU': logs['iou_1'],
                         'validation/no-change-IoU': logs['iou_0'],
-                        'validation/val_epoch': current_epoch
+                        'validation/val_step': current_epoch               
                     })
                 
                 if logs['epoch_acc'] > best_mF1:
@@ -278,7 +285,7 @@ if __name__ == "__main__":
 
             if wandb_logger:
                 wandb_logger.log_metrics({'epoch': current_epoch-1})
-                val_step += 1
+                
         logger.info('End of training.')
     else:
         logger.info('Begin Model Evaluation (testing).')

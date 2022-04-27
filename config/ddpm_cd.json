@@ -54,7 +54,7 @@
     },
 
     "model_cd": {
-        "feat_scales": [6, 7, 8, 9, 10, 11, 12, 13, 14],
+        "feat_scales": [10, 11],
         "out_channels": 2,
         "loss_type": "ce",
         "output_cm_size": 256
@@ -116,6 +116,11 @@
         "optimizer": {
             "type": "adam",
             "lr": 1e-4
+        },
+        "sheduler": {
+            "lr_policy": "linear",  // options: linear, poly, step
+            "n_steps": 3,           //this is aplicable only if step sheduler using
+            "gamma": 0.1            //Multiplicative factor of learning rate decay. Default: 0.1.
         }
     },
     "wandb": {
