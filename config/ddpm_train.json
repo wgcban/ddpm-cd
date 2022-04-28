@@ -19,7 +19,7 @@
             "dataroot": "dataset/LEVIR-WHU-DSIFN", // Options: "dataset/LEVIR-WHU-DSIFN", "dataset/Million-AID"
             "resolution": 256, // high resolution
             "batch_size": 8,
-            "num_workers": 8,
+            "num_workers": 4,
             "use_shuffle": true,
             "data_len": -1 // -1 represents all data used in train
         },
