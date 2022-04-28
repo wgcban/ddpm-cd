@@ -4,6 +4,7 @@
 /dataset
 /chckpoints/*
 /experiments
+link to *
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -137,3 +138,5 @@ dmypy.json
 .pyre/
 
 *.lmdb
+./experiments
+./dataset
