@@ -30,6 +30,6 @@ class ImageDataset(Dataset):
     def __getitem__(self, index):
         img = Image.open(self.path[index]).convert("RGB")
 
-        img = Util.transform_augment(img, split=self.split, min_max=(-1, 1))
+        img = Util.transform_augment(img, split=self.split, min_max=(-1, 1), res=self.res)
             
         return {'img': img,  'Index': index}

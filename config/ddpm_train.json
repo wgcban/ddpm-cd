@@ -9,14 +9,14 @@
         "log": "logs",
         "tb_logger": "tb_logger",
         "results": "results",
-        "checkpoint": "checkpoint"
+        "checkpoint": "checkpoint",
         //"resume_state": null
-        //"resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I190000_E75"
+        "resume_state": "experiments/ddpm-RS-Unet_220425_062858/checkpoint/I60000_E8"
     },
     "datasets": {
         "train": {
-            "name": "Million-AID", //"LEVIR-WHU-DSIFN",
-            "dataroot": "dataset/Million-AID", //"dataset/LEVIR-WHU-DSIFN",
+            "name": "LEVIR-WHU-DSIFN", // Options: "LEVIR-WHU-DSIFN", "Million-AID"
+            "dataroot": "dataset/LEVIR-WHU-DSIFN", // Options: "dataset/LEVIR-WHU-DSIFN", "dataset/Million-AID"
             "resolution": 256, // high resolution
             "batch_size": 8,
             "num_workers": 8,
@@ -24,9 +24,9 @@
             "data_len": -1 // -1 represents all data used in train
         },
         "val": {
-            "name": "Million-AID", //"LEVIR-CD-256",
+            "name": "LEVIR-WHU-DSIFN", // Options: "LEVIR-CD-256", "Million-AID"
             "resolution": 256,
-            "data_len": 3
+            "data_len": 10
         }
     },
     "model": {

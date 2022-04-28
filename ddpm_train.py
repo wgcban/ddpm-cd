@@ -19,7 +19,6 @@ if __name__ == "__main__":
     parser.add_argument('-gpu', '--gpu_ids', type=str, default=None)
     parser.add_argument('-debug', '-d', action='store_true')
     parser.add_argument('-enable_wandb', action='store_true')
-    parser.add_argument('-log_wandb_ckpt', action='store_false')
     parser.add_argument('-log_eval', action='store_true')
 
     # parse configs
@@ -80,6 +79,7 @@ if __name__ == "__main__":
 
     diffusion.set_new_noise_schedule(
         opt['model']['beta_schedule'][opt['phase']], schedule_phase=opt['phase'])
+        
     if opt['phase'] == 'train':
         while current_step < n_iter:
             current_epoch += 1
@@ -144,9 +144,6 @@ if __name__ == "__main__":
                 if current_step % opt['train']['save_checkpoint_freq'] == 0:
                     logger.info('Saving models and training states.')
                     diffusion.save_network(current_epoch, current_step)
-
-                    if wandb_logger and opt['log_wandb_ckpt']:
-                        wandb_logger.log_checkpoint(current_epoch, current_step)
 
             if wandb_logger:
                 wandb_logger.log_metrics({'epoch': current_epoch-1})
