@@ -1,7 +1,7 @@
 #Dataset folders
 /dataset/pavia_center/*
 /dataset/cave/*
-dataset
+/dataset
 /chckpoints/*
 /experiments
 
