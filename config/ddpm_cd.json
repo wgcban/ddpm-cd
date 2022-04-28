@@ -54,7 +54,7 @@
     },
 
     "model_cd": {
-        "feat_scales": [10, 11],
+        "feat_scales": [10, 11, 14],
         "out_channels": 2,
         "loss_type": "ce",
         "output_cm_size": 256
