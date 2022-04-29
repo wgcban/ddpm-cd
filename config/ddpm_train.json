@@ -3,7 +3,7 @@
     "phase": "train", // train (train+val) or test
     "distributed": true,
     "gpu_ids": [
-        1
+        2
     ],
     "path": { //set the path
         "log": "logs",
@@ -11,12 +11,12 @@
         "results": "results",
         "checkpoint": "checkpoint",
         //"resume_state": null
-        "resume_state": "experiments/ddpm-RS-Unet_220425_062858/checkpoint/I60000_E8"
+        "resume_state": "experiments/ddpm-RS-Unet_220426_160536/checkpoint/I110000_E88"
     },
     "datasets": {
         "train": {
             "name": "LEVIR-WHU-DSIFN", // Options: "LEVIR-WHU-DSIFN", "Million-AID"
-            "dataroot": "dataset/LEVIR-WHU-DSIFN", // Options: "dataset/LEVIR-WHU-DSIFN", "dataset/Million-AID"
+            "dataroot": "dataset/Million-AID-LWD", // Options: "dataset/LEVIR-WHU-DSIFN", "dataset/Million-AID"
             "resolution": 256, // high resolution
             "batch_size": 8,
             "num_workers": 4,
@@ -24,7 +24,7 @@
             "data_len": -1 // -1 represents all data used in train
         },
         "val": {
-            "name": "LEVIR-WHU-DSIFN", // Options: "LEVIR-CD-256", "Million-AID"
+            "name": "Million-AID-LWD", // Options: "LEVIR-CD-256", "Million-AID"
             "resolution": 256,
             "data_len": 10
         }

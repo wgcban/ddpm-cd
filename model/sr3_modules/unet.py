@@ -237,9 +237,10 @@ class UNet(nn.Module):
         t = self.noise_level_mlp(time) if exists(
             self.noise_level_mlp) else None
 
-        #First downsampling layer
+        # First downsampling layer
         x  = self.init_conv(x)
 
+        # Diffusion encoder
         feats = [x]
         for layer in self.downs:
             if isinstance(layer, ResnetBlocWithAttn):
@@ -248,20 +249,35 @@ class UNet(nn.Module):
                 x = layer(x)
             feats.append(x)
         
+        # Saving encoder features for CD head
         if feat_need:
-            return feats
+            feats_en = feats
 
+        # Passing through middle layer
         for layer in self.mid:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(x, t)
             else:
                 x = layer(x)
 
+        # Saving decoder features for CD Head
+        if feat_need:
+            feats_dec = [x]
+
+        # Diffiusion decoder
         for layer in self.ups:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(torch.cat((x, feats.pop()), dim=1), t)
             else:
                 x = layer(x)
-
+            
+            if feat_need:
+                feats_dec.append(x)
+        
+        # Final Diffusion layer
         x = self.final_conv(x)
+
+        # Output encoder and decoder features if feat_need
+        if feat_need:
+            return {'fe': feats_en, 'fd': feats_dec.reverse()}
         return x

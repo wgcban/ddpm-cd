@@ -93,13 +93,15 @@ rcrop = torchvision.transforms.RandomCrop(size=256)
 resize = torchvision.transforms.Resize(size=256)
 
 # augmentations for images
-def transform_augment(img, split='val', min_max=(0, 1)):
+def transform_augment(img, split='val', min_max=(0, 1), res=256):
     img = totensor(img)
     if split == 'train':
-        # if img.size(1) < 256:
-        #     img = resize(img)
-        # else:
-        #     img = rcrop(img)
+        if img.size(1) < res:
+            img = resize(img)
+        elif img.size(1) > res:
+            img = rcrop(img)
+        else:
+            img=img
         img = hflip(img)
     ret_img = img * (min_max[1] - min_max[0]) + min_max[0]
     return ret_img
