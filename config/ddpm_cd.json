@@ -2,7 +2,7 @@
     "name": "ddpm-RS-CDHead",
     "phase": "train", // train or test
     "gpu_ids": [
-        8
+        6
     ],
 
     "path": { //set the paths
@@ -11,7 +11,7 @@
         "results": "results",
         "checkpoint": "checkpoint",
         //"resume_state": null
-        "resume_state": "experiments/ddpm-RS-Unet_220425_062858/checkpoint/I60000_E8" //set path to pre-trained diffusion model
+        "resume_state": "experiments/ddpm-RS-Unet_220428_183313/checkpoint/I190000_E97" //"experiments/ddpm-RS-Unet_220425_062858/checkpoint/I60000_E8" //set path to pre-trained diffusion model
     },
 
     "path_cd": { //set the path 
@@ -54,10 +54,11 @@
     },
 
     "model_cd": {
-        "feat_scales": [9, 10, 11, 12, 13, 14],
+        "feat_scales": [2, 5, 8, 11, 14],
         "out_channels": 2,
         "loss_type": "ce",
-        "output_cm_size": 256
+        "output_cm_size": 256,
+        "psp": true
     },
 
     "model": {

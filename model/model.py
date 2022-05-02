@@ -83,13 +83,13 @@ class DDPM(BaseModel):
         B = self.data["B"]
         with torch.no_grad():
             if isinstance(self.netG, nn.DataParallel):
-                feats_A = self.netG.module.feats(A, t)
-                feats_B = self.netG.module.feats(B, t)
+                fe_A, fd_A = self.netG.module.feats(A, t)
+                fe_B, fd_B = self.netG.module.feats(B, t)
             else:
-                feats_A = self.netG.feats(A, t)
-                feats_B = self.netG.feats(B, t)
+                fe_A, fd_A = self.netG.feats(A, t)
+                fe_B, fd_B = self.netG.feats(B, t)
         self.netG.train()
-        return feats_A, feats_B
+        return fe_A, fd_A, fe_B, fd_B
 
     def sample(self, batch_size=1, continous=False):
         self.netG.eval()

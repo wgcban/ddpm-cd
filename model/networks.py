@@ -6,6 +6,7 @@ from torch.nn import init
 from torch.nn import modules
 logger = logging.getLogger('base')
 from model.cd_modules.cd_head import cd_head
+from model.cd_modules.cd_head_v2 import cd_head_v2
 ####################
 # initialize
 ####################
@@ -123,7 +124,13 @@ def define_CD(opt):
     diffusion_model_opt = opt['model']
     
     # Define change detection network head
-    netCD = cd_head(feat_scales=cd_model_opt['feat_scales'], 
+    # netCD = cd_head(feat_scales=cd_model_opt['feat_scales'], 
+    #                 out_channels=cd_model_opt['out_channels'], 
+    #                 inner_channel=diffusion_model_opt['unet']['inner_channel'], 
+    #                 channel_multiplier=diffusion_model_opt['unet']['channel_multiplier'],
+    #                 img_size=cd_model_opt['output_cm_size'],
+    #                 psp=cd_model_opt['psp'])
+    netCD = cd_head_v2(feat_scales=cd_model_opt['feat_scales'], 
                     out_channels=cd_model_opt['out_channels'], 
                     inner_channel=diffusion_model_opt['unet']['inner_channel'], 
                     channel_multiplier=diffusion_model_opt['unet']['channel_multiplier'],

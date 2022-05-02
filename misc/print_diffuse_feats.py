@@ -1,7 +1,7 @@
 import core.metrics as Metrics
 import os
 
-def print_feats(opt, train_data, level):
+def print_feats(opt, train_data, feats_A, feats_B, level, t):
     feature_path = '{}/features'.format(opt['path']['results'])
     os.makedirs(feature_path, exist_ok=True)
 

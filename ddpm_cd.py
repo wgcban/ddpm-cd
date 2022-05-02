@@ -10,6 +10,7 @@ from tensorboardX import SummaryWriter
 import os
 import numpy as np
 from model.cd_modules.cd_head import cd_head 
+from misc.print_diffuse_feats import print_feats
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -115,10 +116,17 @@ if __name__ == "__main__":
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
-                feats_A, feats_B = diffusion.get_feats(t=np.random.randint(low=2, high=8))
+                t=200 #np.random.randint(low=2, high=8)
+                fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=t)
+
+                # Uncommet the following line to visualize features from the diffusion model
+                # print_feats(opt=opt, train_data=train_data, feats_A=fd_A, feats_B=fd_B, level=4, t=t)
+
+                # for i in range(0, len(fd_A)):
+                #     print(fd_A[i].shape)
 
                 # Feeding features from the diffusion model to the CD model
-                change_detection.feed_data(feats_A, feats_B, train_data)
+                change_detection.feed_data(fd_A, fd_B, train_data)
                 change_detection.optimize_parameters()
                 change_detection._collect_running_batch_states()
 
@@ -162,10 +170,6 @@ if __name__ == "__main__":
                         grid_img = Metrics.tensor2img(grid_img)  # uint8
                         Metrics.save_img(
                             grid_img, '{}/img_A_B_pred_gt_e{}_b{}.png'.format(train_result_path, current_epoch, current_step))
-
-
-                    # Uncommet the following line to visualize features from the diffusion model
-                    # print_feats(opt, train_data, level=3)
                 
             ### log epoch status ###
             change_detection._collect_epoch_states()
@@ -204,10 +208,11 @@ if __name__ == "__main__":
                 for current_step, val_data in enumerate(val_loader):
                     # Feed data to diffusion model
                     diffusion.feed_data(val_data)
-                    feats_A, feats_B = diffusion.get_feats(t=5)
+                    t= 200 #np.random.randint(low=2, high=8)
+                    fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=t)
 
                     # Feed data to CD model
-                    change_detection.feed_data(feats_A, feats_B, val_data)
+                    change_detection.feed_data(fd_A, fd_B, val_data)
                     change_detection.test()
                     change_detection._collect_running_batch_states()
                     

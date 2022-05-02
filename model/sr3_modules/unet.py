@@ -157,6 +157,8 @@ class ResnetBlocWithAttn(nn.Module):
             x = self.attn(x)
         return x
 
+def Reverse(lst):
+    return [ele for ele in reversed(lst)]
 
 class UNet(nn.Module):
     def __init__(
@@ -249,9 +251,8 @@ class UNet(nn.Module):
                 x = layer(x)
             feats.append(x)
         
-        # Saving encoder features for CD head
         if feat_need:
-            feats_en = feats
+            fe = feats.copy()
 
         # Passing through middle layer
         for layer in self.mid:
@@ -262,22 +263,22 @@ class UNet(nn.Module):
 
         # Saving decoder features for CD Head
         if feat_need:
-            feats_dec = [x]
+            fd = []
 
         # Diffiusion decoder
         for layer in self.ups:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(torch.cat((x, feats.pop()), dim=1), t)
+                if feat_need:
+                    fd.append(x)
             else:
                 x = layer(x)
-            
-            if feat_need:
-                feats_dec.append(x)
-        
+
         # Final Diffusion layer
         x = self.final_conv(x)
 
         # Output encoder and decoder features if feat_need
         if feat_need:
-            return {'fe': feats_en, 'fd': feats_dec.reverse()}
-        return x
+            return fe, Reverse(fd)
+        else:
+            return x

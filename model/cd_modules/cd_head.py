@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.padding import ReplicationPad2d
+from model.cd_modules.psp import _PSPModule
 
 def get_in_channels(feat_scales, inner_channel, channel_multiplier):
     '''
@@ -11,13 +12,11 @@ def get_in_channels(feat_scales, inner_channel, channel_multiplier):
     '''
     in_channels = 0
     for scale in feat_scales:
-        if scale < 4: #256 x 256
+        if scale < 3: #256 x 256
             in_channels += inner_channel*channel_multiplier[0]
         elif scale < 6: #128 x 128
             in_channels += inner_channel*channel_multiplier[1]
-        elif scale < 7: #64 x 64
-            in_channels += inner_channel*channel_multiplier[1]
-        elif scale < 10: #64 x 64
+        elif scale < 9: #64 x 64
             in_channels += inner_channel*channel_multiplier[2]
         elif scale < 12: #32 x 32
             in_channels += inner_channel*channel_multiplier[3]
@@ -33,7 +32,7 @@ class cd_head(nn.Module):
     Change detection head.
     '''
 
-    def __init__(self, feat_scales, out_channels=2, inner_channel=None, channel_multiplier=None, img_size=256):
+    def __init__(self, feat_scales, out_channels=2, inner_channel=None, channel_multiplier=None, img_size=256, psp=False):
         super(cd_head, self).__init__()
 
         # Define the parameters of the change detection head
@@ -44,12 +43,19 @@ class cd_head(nn.Module):
         # Convolutional layers before parsing to difference head
         self.diff_layers = nn.ModuleList()
         for feat in feat_scales:
-            self.diff_layers.append(nn.Conv2d(  in_channels=get_in_channels([feat], inner_channel, channel_multiplier), 
-                                                out_channels=get_in_channels([feat], inner_channel, channel_multiplier), 
-                                                kernel_size=3, 
-                                                padding=1))
+            if psp:
+                self.diff_layers.append(_PSPModule(in_channels=get_in_channels([feat], inner_channel, channel_multiplier),
+                                        bin_sizes=[1, 2, 3, 6]))
+            else:
+                self.diff_layers.append(nn.Conv2d(  in_channels=get_in_channels([feat], inner_channel, channel_multiplier), 
+                                                    out_channels=get_in_channels([feat], inner_channel, channel_multiplier), 
+                                                    kernel_size=3, 
+                                                    padding=1))
 
         #MLP layer to reduce the feature dimention
+        if psp:
+            self.in_channels = int(self.in_channels/4)
+        
         self.conv1_final = nn.Conv2d(self.in_channels, 64, kernel_size=1, padding=0)
 
         #Get final change map
@@ -62,7 +68,8 @@ class cd_head(nn.Module):
         feats_diff = []
         c=0
         for layer in self.diff_layers:
-            x = torch.abs(layer(feats_A[self.feat_scales[c]]) - layer(feats_B[self.feat_scales[c]]))
+            x = layer(torch.abs(feats_A[self.feat_scales[c]] - feats_B[self.feat_scales[c]]))
+            #torch.abs(layer(feats_A[self.feat_scales[c]]) - layer(feats_B[self.feat_scales[c]]))
             feats_diff.append(x)
             c+=1
         

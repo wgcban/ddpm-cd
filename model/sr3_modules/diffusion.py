@@ -266,6 +266,6 @@ class GaussianDiffusion(nn.Module):
         x_noisy = self.q_sample(
             x_start=x_start, continuous_sqrt_alpha_cumprod=continuous_sqrt_alpha_cumprod.view(-1, 1, 1, 1), noise=noise)
 
-        feats = self.denoise_fn(x_noisy, continuous_sqrt_alpha_cumprod, feat_need=True)
+        fe, fd = self.denoise_fn(x_noisy, continuous_sqrt_alpha_cumprod, feat_need=True)
 
-        return feats
+        return fe, fd
