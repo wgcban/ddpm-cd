@@ -116,7 +116,7 @@ if __name__ == "__main__":
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
-                t=200 #np.random.randint(low=2, high=8)
+                t=50 #np.random.randint(low=2, high=8)
                 fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=t)
 
                 # Uncommet the following line to visualize features from the diffusion model
@@ -208,7 +208,7 @@ if __name__ == "__main__":
                 for current_step, val_data in enumerate(val_loader):
                     # Feed data to diffusion model
                     diffusion.feed_data(val_data)
-                    t= 200 #np.random.randint(low=2, high=8)
+                    t= 50 #np.random.randint(low=2, high=8)
                     fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=t)
 
                     # Feed data to CD model
