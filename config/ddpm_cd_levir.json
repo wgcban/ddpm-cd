@@ -58,7 +58,8 @@
         "out_channels": 2,
         "loss_type": "ce",
         "output_cm_size": 256,
-        "psp": true
+        "psp": true,
+        "t": 150
     },
 
     "model": {

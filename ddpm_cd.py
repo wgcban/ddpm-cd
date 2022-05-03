@@ -116,8 +116,7 @@ if __name__ == "__main__":
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
-                t=50 #np.random.randint(low=2, high=8)
-                fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=t)
+                fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=opt['model_cd']['t']) #np.random.randint(low=2, high=8)
 
                 # Uncommet the following line to visualize features from the diffusion model
                 # print_feats(opt=opt, train_data=train_data, feats_A=fd_A, feats_B=fd_B, level=4, t=t)
@@ -208,8 +207,7 @@ if __name__ == "__main__":
                 for current_step, val_data in enumerate(val_loader):
                     # Feed data to diffusion model
                     diffusion.feed_data(val_data)
-                    t= 50 #np.random.randint(low=2, high=8)
-                    fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=t)
+                    fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=opt['model_cd']['t'])
 
                     # Feed data to CD model
                     change_detection.feed_data(fd_A, fd_B, val_data)
@@ -305,7 +303,7 @@ if __name__ == "__main__":
         for current_step, test_data in enumerate(test_loader):
             # Feed data to diffusion model
             diffusion.feed_data(test_data)
-            feats_A, feats_B = diffusion.get_feats(t=5)
+            feats_A, feats_B = diffusion.get_feats(t=opt['model_cd']['t'])
 
             # Feed data to CD model
             change_detection.feed_data(feats_A, feats_B, test_data)
