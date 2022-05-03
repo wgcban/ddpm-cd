@@ -2,7 +2,7 @@
     "name": "ddpm-RS-CDHead-DSIFN",
     "phase": "train", // train or test
     "gpu_ids": [
-        8
+        5
     ],
 
     "path": { //set the paths
@@ -59,7 +59,7 @@
         "loss_type": "ce",
         "output_cm_size": 256,
         "psp": true,
-        "t": 150
+        "t": 100
     },
 
     "model": {
