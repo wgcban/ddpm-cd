@@ -32,7 +32,7 @@ def get_img_path(root_dir, img_name):
 
 
 def get_label_path(root_dir, img_name):
-    return os.path.join(root_dir, ANNOT_FOLDER_NAME, img_name.replace('.jpg', label_suffix))
+    return os.path.join(root_dir, ANNOT_FOLDER_NAME, img_name) #.replace('.jpg', label_suffix)
 
 class CDDataset(Dataset):
     def __init__(self, dataroot, resolution=256, split='train', data_len=-1):

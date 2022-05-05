@@ -39,6 +39,9 @@ class CD(BaseModel):
                 raise NotImplementedError(
                     'Optimizer [{:s}] not implemented'.format(opt['train']["optimizer"]["type"]))
             self.log_dict = OrderedDict()
+            
+            #Define learning rate sheduler
+            self.exp_lr_scheduler_netCD = get_scheduler(optimizer=self.optCD, args=opt['train'])
         else:
             self.netCD.eval()
             self.log_dict = OrderedDict()
@@ -49,9 +52,6 @@ class CD(BaseModel):
         self.running_metric = ConfuseMatrixMeter(n_class=opt['model_cd']['out_channels'])
         self.len_train_dataloader = opt["len_train_dataloader"]
         self.len_val_dataloader = opt["len_val_dataloader"]
-
-        #Define learning rate sheduler
-        self.exp_lr_scheduler_netCD = get_scheduler(optimizer=self.optCD, args=opt['train'])
 
     # Feeding all data to the CD model
     def feed_data(self, feats_A, feats_B, data):

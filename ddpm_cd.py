@@ -303,10 +303,10 @@ if __name__ == "__main__":
         for current_step, test_data in enumerate(test_loader):
             # Feed data to diffusion model
             diffusion.feed_data(test_data)
-            feats_A, feats_B = diffusion.get_feats(t=opt['model_cd']['t'])
+            fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=opt['model_cd']['t'])
 
             # Feed data to CD model
-            change_detection.feed_data(feats_A, feats_B, test_data)
+            change_detection.feed_data(fd_A, fd_B, test_data)
             change_detection.test()
             change_detection._collect_running_batch_states()
 

@@ -1,8 +1,8 @@
 {
-    "name": "ddpm-RS-CDHead-DSIFN",
+    "name": "ddpm-RS-CDHead-WHU",
     "phase": "train", // train or test
     "gpu_ids": [
-        5
+        3
     ],
 
     "path": { //set the paths
@@ -25,8 +25,8 @@
 
     "datasets": {
         "train": {
-            "name": "DSIFN-CD-256",
-            "dataroot": "dataset/DSIFN-CD-256/",
+            "name": "WHU-CD-256",
+            "dataroot": "dataset/WHU-CD-256/",
             "resolution": 256, // high resolution
             "batch_size": 16,
             "num_workers": 8,
@@ -34,8 +34,8 @@
             "data_len": -1 // -1 represents all data used in train
         },
         "val": {
-            "name": "DSIFN-CD-256",
-            "dataroot": "dataset/DSIFN-CD-256/",
+            "name": "WHU-CD-256",
+            "dataroot": "dataset/WHU-CD-256/",
             "resolution": 256, // high resolution
             "batch_size": 4,
             "num_workers": 8,
@@ -43,8 +43,8 @@
             "data_len": -1 // -1 represents all data used in train
         },
         "test": {
-            "name": "DSIFN-CD-256",
-            "dataroot": "dataset/DSIFN-CD-256/",
+            "name": "WHU-CD-256",
+            "dataroot": "dataset/WHU-CD-256/",
             "resolution": 256, // high resolution
             "batch_size": 4,
             "num_workers": 8,
@@ -59,7 +59,7 @@
         "loss_type": "ce",
         "output_cm_size": 256,
         "psp": true,
-        "t": 100
+        "t": 5
     },
 
     "model": {
