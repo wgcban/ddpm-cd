@@ -42,6 +42,7 @@ Udate the path to pre-trained diffusion model weights (`*_gen.pth` and `*_opt.pt
 
 ### Training the change detection network
 Run the following code to start the training.
+
 - Training on LEVIR-CD dataset:
     - 
     ```python
