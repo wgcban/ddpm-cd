@@ -23,8 +23,6 @@ We use ``ddpm_train.json`` to setup the configurations. Update the dataset ``nam
 python ddpm_train.py --config config/ddpm_train.json -enable_wandb -log_eval
 ```
 
-
-### Training/Resume Training
 In case, if you want to resume the training from previosely saved point, provide the path to saved model in ``path/resume_state``, else keep it as null.
 
 # Training change detection network
