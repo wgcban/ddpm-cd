@@ -10,6 +10,7 @@ This is the offical implementation of **Remote Sensing Change Detection using De
 pip3 install -r requirement.txt
 ```
 
+# Training diffusion model with remote sensing data
 ### Collect off-the-shelf remote sensing data to train diffusion model
 
 Dump all the remote sensing data sampled from Google Earth Engine and any other publically available remote sensing images to dataset folder or create a simlink. 
