@@ -60,9 +60,29 @@ Run the following code to start the training.
     python ddpm_cd.py --config config/cdd.json -enable_wandb -log_eval
     ```
 
-The results will be saved in `experiments` and also uploaded to `wandb`.
+The results will be saved in `experiments` and also upload to `wandb`.
 
 ## Testing
+To obtain the predictions and performance metrics (iou, f1, and OA), first provide the path to pre-trained diffusion model here [`path`][`resume_state`] and path to trained change detection model (the best model) here [`path_cd`][`resume_state`] in `levir_test.json`, `whu_test.json`, `dsifn_test.json`, and `cdd_test.json`.
+
+Run the following code to start the training.
+- Test on LEVIR-CD:
+    ```python
+    python ddpm_cd.py --config config/levir_test.json --phase test -enable_wandb -log_eval
+    ```
+- Test on WHU-CD:
+    ```python
+    python ddpm_cd.py --config config/whu.json --phase test -enable_wandb -log_eval
+    ```
+- Test on DSIFN-CD:
+    ```python
+    python ddpm_cd.py --config config/dsifn.json --phase test -enable_wandb -log_eval
+    ```
+- Test on CDD:
+    ```python
+    python ddpm_cd.py --config config/cdd.json --phase test -enable_wandb -log_eval
+    ```
+
 
 
 

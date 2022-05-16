@@ -60,7 +60,7 @@
         "loss_type": "ce",
         "output_cm_size": 256,
         "feat_type": "dec", //Options: 'enc'/'dec'
-        "t": [50, 100, 400, 650]
+        "t": [50, 100, 400]
     },
 
     "model": {
