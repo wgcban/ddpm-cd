@@ -6,7 +6,7 @@ This is the offical **Pytorch** implementation of **Remote Sensing Change Detect
 
 ## Environment
 ```bash
-conda create -n ddpm-cd python=3.9.12
+conda create -n ddpm-cd python=3.9
 ```
 ```bash
 conda activate ddpm-cd
@@ -29,6 +29,13 @@ python ddpm_train.py --config config/ddpm_train.json -enable_wandb -log_eval
 ```
 
 In case, if you want to resume the training from previosely saved point, provide the path to saved model in ``path/resume_state``, else keep it as null.
+
+### Sampling from the diffusion model
+If you want generate samples from the diffusion model, first update the path to trained diffusion model in [`path`][`resume_state`]. Then run the following command.
+```python
+python ddpm_train.py --config config/ddpm_sampling.json --phase val
+```
+The generated images will be saved in `experiments`.
 
 ## Change Detection
 ### Training
