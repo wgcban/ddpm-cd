@@ -89,25 +89,25 @@ Predictions will be saved in `experiments` and performance metrics will be uploa
 - Pre-trained diffusion model: [`Click Here`]()
 - Pre-trained change detection networks:
     - "t": [50]
-        - LEVIR-CD [`cd-levir-50`]()
-        - WHU-CD [`cd-whu-50`]()
-        - DSIFN-CD [`cd-dsifn-50`]()
-        - CDD-CD [`cd-cdd-50`]()
+        - LEVIR-CD [`cd-levir-50`](https://www.dropbox.com/sh/y43gh94t1ih18kl/AAB4T2nYGC0vIChYRSg9CVtHa?dl=0)
+        - WHU-CD [`cd-whu-50`](https://www.dropbox.com/sh/um1rh7fgcvss4v2/AABvsOSaipDWYA5oeHd6IQ97a?dl=0)
+        - DSIFN-CD [`cd-dsifn-50`](https://www.dropbox.com/sh/2z5zlqz9m8bkmus/AACxuhLYC0VsNS5UBKO1JtHua?dl=0)
+        - CDD-CD [`cd-cdd-50`](https://www.dropbox.com/sh/2nf77dz30m5i1zg/AABn3o7imwqv1ObSr1v5MHN1a?dl=0)
     - "t": [100]
-        - LEVIR-CD [`cd-levir-100`]()
-        - WHU-CD [`cd-whu-100`]()
-        - DSIFN-CD [`cd-dsifn-100`]()
-        - CDD-CD [`cd-cdd-100`]()
+        - LEVIR-CD [`cd-levir-100`](https://www.dropbox.com/sh/n7ktxbrbxdrtoxy/AACEMhg5cvOlBkN3FSF_MmGca?dl=0)
+        - WHU-CD [`cd-whu-100`](https://www.dropbox.com/sh/ux3r8a5xo0g22rf/AACFn5pkGuN3N-lajPUy93_3a?dl=0)
+        - DSIFN-CD [`cd-dsifn-100`](https://www.dropbox.com/sh/f7ike5ufdtfpd5h/AACWoOiE78t7n47HnDUGTJsZa?dl=0)
+        - CDD-CD [`cd-cdd-100`](https://www.dropbox.com/sh/sdzjch0r2qscrle/AABlIBJlXfwavo-97dPTTKSna?dl=0)
     - "t": [50, 100]
-        - LEVIR-CD [`cd-levir-50-100`]()
-        - WHU-CD [`cd-whu-50-100`]()
-        - DSIFN-CD [`cd-dsifn-50-100`]()
-        - CDD-CD [`cd-cdd-50-100`]()
+        - LEVIR-CD [`cd-levir-50-100`](https://www.dropbox.com/sh/ie9rapb1j2zgvb7/AAALkpLS-tvngTb4HXqAcbbTa?dl=0)
+        - WHU-CD [`cd-whu-50-100`](https://www.dropbox.com/sh/9idrobnmhufo1e7/AABRf38iq-wE7plKZZmwFywva?dl=0)
+        - DSIFN-CD [`cd-dsifn-50-100`](https://www.dropbox.com/sh/001czxn335bul5g/AACRaR-nqQNNHEge6iSH_z-6a?dl=0)
+        - CDD-CD [`cd-cdd-50-100`](https://www.dropbox.com/sh/62wsy9cl8xizx2h/AAB5Dmu-PuOVAfIBugGqlsd8a?dl=0)
     - "t": [50, 100, 400] (*Best Model*)
-        - LEVIR-CD [`cd-levir-50-100-400`]()
-        - WHU-CD [`cd-whu-50-100-400`]()
-        - DSIFN-CD [`cd-dsifn-50-100-400`]()
-        - CDD-CD [`cd-cdd-50-100-400`]()
+        - LEVIR-CD [`cd-levir-50-100-400`](https://www.dropbox.com/sh/sx0aopz230lbuwc/AADKpwP30OHvtYub9FYTyk53a?dl=0)
+        - WHU-CD [`cd-whu-50-100-400`](https://www.dropbox.com/sh/l8iuzb2tudb3yrk/AAA7aZwb5eM12SamCXPh7R-Ra?dl=0)
+        - DSIFN-CD [`cd-dsifn-50-100-400`](https://www.dropbox.com/sh/ekj7kwsohhnjico/AADuz0vBtxCCrYgdgOCG3LX5a?dl=0)
+        - CDD-CD [`cd-cdd-50-100-400`](https://www.dropbox.com/sh/a8dj1i8pnexd5yu/AADnmBGT4VdGY8aZMo7enfS7a?dl=0)
 
 
 
