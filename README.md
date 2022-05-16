@@ -59,6 +59,8 @@ Run the following code to start the training.
     python ddpm_cd.py --config config/cdd.json -enable_wandb -log_eval
     ```
 
+The results will be saved in `experiments` and also uploaded to `wandb`.
+
 
 
 
