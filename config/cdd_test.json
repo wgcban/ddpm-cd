@@ -1,8 +1,8 @@
 {
-    "name": "ddpm-RS-CDHead-LEVIR",
+    "name": "ddpm-RS-CDHead-CDD-[test]",
     "phase": "train", // train or test
     "gpu_ids": [
-        0
+        1
     ],
 
     "path": { //set the paths
@@ -19,24 +19,24 @@
         "tb_logger": "tb_logger",
         "results": "results",
         "checkpoint": "checkpoint",
-        "resume_state": null
-        //"resume_state": "experiments/ddpm-RS-CDHead_220502_082603/checkpoint/best_cd_model" //t=50
-        //"resume_state": "experiments/ddpm-RS-CDHead_220502_083019/checkpoint/best_cd_model" //t=100
+        //"resume_state": null
+        "resume_state": "experiments/ddpm-RS-CDHead-CDD_220505_164831/checkpoint/best_cd_model" //t=50
+        //"resume_state": "experiments/ddpm-RS-CDHead-CDD_220504_154222/checkpoint/best_cd_model" //t=100
     },
 
     "datasets": {
         "train": {
-            "name": "LEVIR-CD-256",
-            "dataroot": "dataset/LEVIR-CD256/",
+            "name": "CDD-256",
+            "dataroot": "dataset/CDD-256/",
             "resolution": 256, // high resolution
-            "batch_size": 8,
+            "batch_size": 8, //16
             "num_workers": 8,
             "use_shuffle": true,
             "data_len": -1 // -1 represents all data used in train
         },
         "val": {
-            "name": "LEVIR-CD-256",
-            "dataroot": "dataset/LEVIR-CD256/",
+            "name": "CDD-CD-256",
+            "dataroot": "dataset/CDD-256/",
             "resolution": 256, // high resolution
             "batch_size": 4,
             "num_workers": 8,
@@ -44,10 +44,10 @@
             "data_len": -1 // -1 represents all data used in train
         },
         "test": {
-            "name": "LEVIR-CD-256",
-            "dataroot": "dataset/LEVIR-CD256/",
+            "name": "CDD-CD-256",
+            "dataroot": "dataset/CDD-256/",
             "resolution": 256, // high resolution
-            "batch_size": 4,
+            "batch_size": 1,
             "num_workers": 8,
             "use_shuffle": false,
             "data_len": -1 // -1 represents all data used in train
@@ -59,8 +59,9 @@
         "out_channels": 2,
         "loss_type": "ce",
         "output_cm_size": 256,
+        "psp": true,
         "feat_type": "dec", //Options: 'enc'/'dec'
-        "t": [50, 100, 400, 650]
+        "t": [50, 100]
     },
 
     "model": {

@@ -116,16 +116,28 @@ if __name__ == "__main__":
             for current_step, train_data in enumerate(train_loader):
                 # Feeding data to diffusion model and get features
                 diffusion.feed_data(train_data)
-                fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=opt['model_cd']['t']) #np.random.randint(low=2, high=8)
 
-                # Uncommet the following line to visualize features from the diffusion model
-                # print_feats(opt=opt, train_data=train_data, feats_A=fd_A, feats_B=fd_B, level=4, t=t)
-
+                f_A=[]
+                f_B=[]
+                for t in opt['model_cd']['t']:
+                    fe_A_t, fd_A_t, fe_B_t, fd_B_t = diffusion.get_feats(t=t) #np.random.randint(low=2, high=8)
+                    if opt['model_cd']['feat_type'] == "dec":
+                        f_A.append(fd_A_t)
+                        f_B.append(fd_B_t)
+                        # Uncommet the following line to visualize features from the diffusion model
+                        # for level in range(0, len(fd_A_t)):
+                        #     print_feats(opt=opt, train_data=train_data, feats_A=fd_A_t, feats_B=fd_B_t, level=level, t=t)
+                        # del fe_A_t, fe_B_t
+                    else:
+                        f_A.append(fe_A_t)
+                        f_B.append(fe_B_t)
+                        del fd_A_t, fd_B_t
+                
                 # for i in range(0, len(fd_A)):
                 #     print(fd_A[i].shape)
 
                 # Feeding features from the diffusion model to the CD model
-                change_detection.feed_data(fd_A, fd_B, train_data)
+                change_detection.feed_data(f_A, f_B, train_data)
                 change_detection.optimize_parameters()
                 change_detection._collect_running_batch_states()
 
@@ -207,10 +219,21 @@ if __name__ == "__main__":
                 for current_step, val_data in enumerate(val_loader):
                     # Feed data to diffusion model
                     diffusion.feed_data(val_data)
-                    fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=opt['model_cd']['t'])
+                    f_A=[]
+                    f_B=[]
+                    for t in opt['model_cd']['t']:
+                        fe_A_t, fd_A_t, fe_B_t, fd_B_t = diffusion.get_feats(t=t) #np.random.randint(low=2, high=8)
+                        if opt['model_cd']['feat_type'] == "dec":
+                            f_A.append(fd_A_t)
+                            f_B.append(fd_B_t)
+                            del fe_A_t, fe_B_t
+                        else:
+                            f_A.append(fe_A_t)
+                            f_B.append(fe_B_t)
+                            del fd_A_t, fd_B_t
 
                     # Feed data to CD model
-                    change_detection.feed_data(fd_A, fd_B, val_data)
+                    change_detection.feed_data(f_A, f_B, val_data)
                     change_detection.test()
                     change_detection._collect_running_batch_states()
                     
@@ -303,10 +326,21 @@ if __name__ == "__main__":
         for current_step, test_data in enumerate(test_loader):
             # Feed data to diffusion model
             diffusion.feed_data(test_data)
-            fe_A, fd_A, fe_B, fd_B = diffusion.get_feats(t=opt['model_cd']['t'])
+            f_A=[]
+            f_B=[]
+            for t in opt['model_cd']['t']:
+                fe_A_t, fd_A_t, fe_B_t, fd_B_t = diffusion.get_feats(t=t) #np.random.randint(low=2, high=8)
+                if opt['model_cd']['feat_type'] == "dec":
+                    f_A.append(fd_A_t)
+                    f_B.append(fd_B_t)
+                    del fe_A_t, fe_B_t
+                else:
+                    f_A.append(fe_A_t)
+                    f_B.append(fe_B_t)
+                    del fd_A_t, fd_B_t
 
             # Feed data to CD model
-            change_detection.feed_data(fd_A, fd_B, test_data)
+            change_detection.feed_data(f_A, f_B, test_data)
             change_detection.test()
             change_detection._collect_running_batch_states()
 
@@ -318,9 +352,11 @@ if __name__ == "__main__":
 
             # Vissuals
             visuals = change_detection.get_current_visuals()
-            img_mode = 'grid'
+            img_mode = 'single'
             if img_mode == 'single':
                 # Converting to uint8
+                visuals['pred_cm'] = visuals['pred_cm']*2.0-1.0
+                visuals['gt_cm'] = visuals['gt_cm']*2.0-1.0
                 img_A   = Metrics.tensor2img(test_data['A'], out_type=np.uint8, min_max=(-1, 1))  # uint8
                 img_B   = Metrics.tensor2img(test_data['B'], out_type=np.uint8, min_max=(-1, 1))  # uint8
                 gt_cm   = Metrics.tensor2img(visuals['gt_cm'].unsqueeze(1).repeat(1, 3, 1, 1), out_type=np.uint8, min_max=(0, 1))  # uint8
@@ -332,9 +368,9 @@ if __name__ == "__main__":
                 Metrics.save_img(
                     img_B, '{}/img_B_{}.png'.format(test_result_path, current_step))
                 Metrics.save_img(
-                    pred_cm, '{}/img_pred_{}.png'.format(test_result_path, current_step))
+                    pred_cm, '{}/img_pred_cm{}.png'.format(test_result_path, current_step))
                 Metrics.save_img(
-                    gt_cm, '{}/img_gt_{}.png'.format(test_result_path, current_step))
+                    gt_cm, '{}/img_gt_cm{}.png'.format(test_result_path, current_step))
             else:
                 # grid img
                 visuals['pred_cm'] = visuals['pred_cm']*2.0-1.0
@@ -356,5 +392,16 @@ if __name__ == "__main__":
             message += '{:s}: {:.4e} '.format(k, v)
             message += '\n'
         logger_test.info(message)
+
+        if wandb_logger:
+            wandb_logger.log_metrics({
+                'test/mF1': logs['epoch_acc'],
+                'test/mIoU': logs['miou'],
+                'test/OA': logs['acc'],
+                'test/change-F1': logs['F1_1'],
+                'test/no-change-F1': logs['F1_0'],
+                'test/change-IoU': logs['iou_1'],
+                'test/no-change-IoU': logs['iou_0'],
+            })
 
         logger.info('End of testing...')

@@ -134,7 +134,8 @@ def define_CD(opt):
                     out_channels=cd_model_opt['out_channels'], 
                     inner_channel=diffusion_model_opt['unet']['inner_channel'], 
                     channel_multiplier=diffusion_model_opt['unet']['channel_multiplier'],
-                    img_size=cd_model_opt['output_cm_size'])
+                    img_size=cd_model_opt['output_cm_size'],
+                    time_steps=cd_model_opt["t"])
     
     # Initialize the change detection head if it is 'train' phase 
     if opt['phase'] == 'train':

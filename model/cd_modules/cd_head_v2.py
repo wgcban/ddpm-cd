@@ -40,11 +40,17 @@ class AttentionBlock(nn.Module):
         return self.block(x)
 
 class Block(nn.Module):
-    def __init__(self, dim, dim_out):
+    def __init__(self, dim, dim_out, time_steps):
         super().__init__()
         self.block = nn.Sequential(
+            nn.Conv2d(dim*len(time_steps), dim, 1)
+            if len(time_steps)>1
+            else None,
+            nn.ReLU()
+            if len(time_steps)>1
+            else None,
             nn.Conv2d(dim, dim_out, 3, padding=1),
-            nn.ReLU(),
+            nn.ReLU()
         )
 
     def forward(self, x):
@@ -56,7 +62,7 @@ class cd_head_v2(nn.Module):
     Change detection head (version 2).
     '''
 
-    def __init__(self, feat_scales, out_channels=2, inner_channel=None, channel_multiplier=None, img_size=256):
+    def __init__(self, feat_scales, out_channels=2, inner_channel=None, channel_multiplier=None, img_size=256, time_steps=None):
         super(cd_head_v2, self).__init__()
 
         # Define the parameters of the change detection head
@@ -64,14 +70,15 @@ class cd_head_v2(nn.Module):
         self.feat_scales    = feat_scales
         self.in_channels    = get_in_channels(feat_scales, inner_channel, channel_multiplier)
         self.img_size       = img_size
+        self.time_steps     = time_steps
 
         # Convolutional layers before parsing to difference head
         self.decoder = nn.ModuleList()
         for i in range(0, len(self.feat_scales)):
             dim     = get_in_channels([self.feat_scales[i]], inner_channel, channel_multiplier)
-            
+
             self.decoder.append(
-                Block(dim=dim, dim_out=dim)
+                Block(dim=dim, dim_out=dim, time_steps=time_steps)
             )
 
             if i != len(self.feat_scales)-1:
@@ -91,7 +98,13 @@ class cd_head_v2(nn.Module):
         lvl=0
         for layer in self.decoder:
             if isinstance(layer, Block):
-                diff = torch.abs( layer(feats_A[self.feat_scales[lvl]])  - layer(feats_B[self.feat_scales[lvl]]) )
+                f_A = feats_A[0][self.feat_scales[lvl]]
+                f_B = feats_B[0][self.feat_scales[lvl]]
+                for i in range(1, len(self.time_steps)):
+                    f_A = torch.cat((f_A, feats_A[i][self.feat_scales[lvl]]), dim=1)
+                    f_B = torch.cat((f_B, feats_B[i][self.feat_scales[lvl]]), dim=1)
+    
+                diff = torch.abs( layer(f_A)  - layer(f_B) )
                 if lvl!=0:
                     diff = diff + x
                 lvl+=1

@@ -73,5 +73,5 @@ class CDDataset(Dataset):
         img_lbl = Util.transform_augment_cd(img_lbl, split=self.split, min_max=(0, 1))
         if img_lbl.dim() > 2:
             img_lbl = img_lbl[0]
-  
+        
         return {'A': img_A, 'B': img_B, 'L': img_lbl, 'Index': index}

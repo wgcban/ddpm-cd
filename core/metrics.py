@@ -39,7 +39,8 @@ def save_img(img, img_path, mode='RGB'):
     # cv2.imwrite(img_path, img)
 
 def save_feat(img, img_path, mode='RGB'):
-    cv2.imwrite(img_path, cv2.applyColorMap(img, cv2.COLORMAP_JET))
+    cv2.imwrite(img_path, cv2.applyColorMap(cv2.resize(img, (256,256), interpolation=cv2.INTER_CUBIC), cv2.COLORMAP_JET))
+    # cv2.imwrite(img_path, cv2.resize(img, (256,256), interpolation=cv2.INTER_))
     # cv2.imwrite(img_path, img)
 
 

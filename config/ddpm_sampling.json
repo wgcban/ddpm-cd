@@ -1,8 +1,8 @@
 {
-    "name": "ddpm-train-remote-sensing",
+    "name": "ddpm-sampling-remote-sensing-imgs",
     "phase": "val", // train or val
     "gpu_ids": [
-        8
+        2
     ],
     "path": { //set the path
         "log": "logs",
@@ -10,12 +10,12 @@
         "results": "results",
         "checkpoint": "checkpoint",
         //"resume_state": null
-        "resume_state": "experiments/ddpm-train-remote-sensing_220420_191353/checkpoint/I80000_E40"
+        "resume_state": "experiments/ddpm-RS-Unet_220428_183313/checkpoint/I190000_E97"
     },
     "datasets": {
         "train": {
-            "name": "LEVIR-CD-256",
-            "dataroot": "dataset/LEVIR-CD-256/AB",
+            "name": "LEVIR-WHU-DSIFN",
+            "dataroot": "dataset/Million-AID-LWD",
             "resolution": 256, // high resolution
             "batch_size": 8,
             "num_workers": 8,
@@ -23,9 +23,9 @@
             "data_len": -1 // -1 represents all data used in train
         },
         "val": {
-            "name": "LEVIR-CD-256",
+            "name": "LEVIR-WHU-DSIFN",
             "resolution": 256,
-            "data_len": 10
+            "data_len": 1000
         }
     },
     "model": {
@@ -34,7 +34,7 @@
         "unet": {
             "in_channel": 3,
             "out_channel": 3,
-            "inner_channel": 64,
+            "inner_channel": 128,
             "channel_multiplier": [
                 1,
                 2,
@@ -57,7 +57,7 @@
             },
             "val": {
                 "schedule": "linear",
-                "n_timestep": 4000,
+                "n_timestep": 3000,
                 "linear_start": 1e-6,
                 "linear_end": 1e-2
             }

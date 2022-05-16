@@ -1,8 +1,8 @@
 {
-    "name": "ddpm-RS-CDHead-LEVIR",
+    "name": "ddpm-RS-CDHead-WHU-[test]",
     "phase": "train", // train or test
     "gpu_ids": [
-        0
+        9
     ],
 
     "path": { //set the paths
@@ -19,15 +19,14 @@
         "tb_logger": "tb_logger",
         "results": "results",
         "checkpoint": "checkpoint",
-        "resume_state": null
-        //"resume_state": "experiments/ddpm-RS-CDHead_220502_082603/checkpoint/best_cd_model" //t=50
-        //"resume_state": "experiments/ddpm-RS-CDHead_220502_083019/checkpoint/best_cd_model" //t=100
+        //"resume_state": null
+        "resume_state": "experiments/ddpm-RS-CDHead-WHU_220505_230541/checkpoint/best_cd_model" //Seth path to train cd-head
     },
 
     "datasets": {
         "train": {
-            "name": "LEVIR-CD-256",
-            "dataroot": "dataset/LEVIR-CD256/",
+            "name": "WHU-CD-256",
+            "dataroot": "dataset/WHU-CD-256/",
             "resolution": 256, // high resolution
             "batch_size": 8,
             "num_workers": 8,
@@ -35,8 +34,8 @@
             "data_len": -1 // -1 represents all data used in train
         },
         "val": {
-            "name": "LEVIR-CD-256",
-            "dataroot": "dataset/LEVIR-CD256/",
+            "name": "WHU-CD-256",
+            "dataroot": "dataset/WHU-CD-256/",
             "resolution": 256, // high resolution
             "batch_size": 4,
             "num_workers": 8,
@@ -44,10 +43,10 @@
             "data_len": -1 // -1 represents all data used in train
         },
         "test": {
-            "name": "LEVIR-CD-256",
-            "dataroot": "dataset/LEVIR-CD256/",
+            "name": "WHU-CD-256",
+            "dataroot": "dataset/WHU-CD-256/",
             "resolution": 256, // high resolution
-            "batch_size": 4,
+            "batch_size": 1,
             "num_workers": 8,
             "use_shuffle": false,
             "data_len": -1 // -1 represents all data used in train
@@ -59,8 +58,9 @@
         "out_channels": 2,
         "loss_type": "ce",
         "output_cm_size": 256,
+        "psp": true,
         "feat_type": "dec", //Options: 'enc'/'dec'
-        "t": [50, 100, 400, 650]
+        "t": [50, 100]
     },
 
     "model": {
@@ -112,7 +112,7 @@
     },
     
     "train": {
-        "n_epoch": 120,
+        "n_epoch": 80,
         "train_print_freq": 500,
         "val_freq": 1,
         "val_print_freq": 50,

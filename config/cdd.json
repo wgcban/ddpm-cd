@@ -1,8 +1,8 @@
 {
-    "name": "ddpm-RS-CDHead-CDD-test",
+    "name": "ddpm-RS-CDHead-CDD",
     "phase": "train", // train or test
     "gpu_ids": [
-        1
+        2
     ],
 
     "path": { //set the paths
@@ -19,9 +19,9 @@
         "tb_logger": "tb_logger",
         "results": "results",
         "checkpoint": "checkpoint",
-        //"resume_state": null
+        "resume_state": null
         //"resume_state": "experiments/ddpm-RS-CDHead_220502_082603/checkpoint/best_cd_model" //t=50
-        "resume_state": "experiments/ddpm-RS-CDHead-CDD_220504_154222/checkpoint/best_cd_model" //t=100
+        //"resume_state": "experiments/ddpm-RS-CDHead-CDD_220504_154222/checkpoint/best_cd_model" //t=100
     },
 
     "datasets": {
@@ -29,7 +29,7 @@
             "name": "CDD-256",
             "dataroot": "dataset/CDD-256/",
             "resolution": 256, // high resolution
-            "batch_size": 16,
+            "batch_size": 8, //16
             "num_workers": 8,
             "use_shuffle": true,
             "data_len": -1 // -1 represents all data used in train
@@ -60,7 +60,8 @@
         "loss_type": "ce",
         "output_cm_size": 256,
         "psp": true,
-        "t": 50
+        "feat_type": "dec", //Options: 'enc'/'dec'
+        "t": [50, 100, 400, 650]
     },
 
     "model": {
