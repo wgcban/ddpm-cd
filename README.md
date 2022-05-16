@@ -29,13 +29,14 @@ In case, if you want to resume the training from previosely saved point, provide
 ## Download change detection dataset
 Download the change detection datasets from the following links.
 Links to download datasets:
-[LEVIR-CD]()
 
-[WHU-CD]()
+-[LEVIR-CD]()
 
-[DSIFN-CD]()
+-[WHU-CD]()
 
-[CDD]
+-[DSIFN-CD]()
+
+-[CDD]()
 
 Next, update the paths to those folders here [`datasets`][`train`][`dataroot`], [`datasets`][`val`][`dataroot`], [`datasets`][`test`][`dataroot`] in `levir.json`, `whu.json`, `dsifn.json`, and `cdd.json`.
 
