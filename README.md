@@ -42,22 +42,19 @@ Udate the path to pre-trained diffusion model weights (`*_gen.pth` and `*_opt.pt
 
 ### Training the change detection network
 Run the following code to start the training.
-- Training on LEVIR-CD dataset:
+- Training on LEVIR-CD:
     ```python
     python ddpm_cd.py --config config/levir.json -enable_wandb -log_eval
     ```
-- Training on WHU-CD dataset:
-    - 
+- Training on WHU-CD:
     ```python
     python ddpm_cd.py --config config/whu.json -enable_wandb -log_eval
     ```
-- Training on DSIFN-CD dataset:
-    - 
+- Training on DSIFN-CD:
     ```python
     python ddpm_cd.py --config config/dsifn.json -enable_wandb -log_eval
     ```
-- Training on CDD dataset:
-    - 
+- Training on CDD:
     ```python
     python ddpm_cd.py --config config/cdd.json -enable_wandb -log_eval
     ```
