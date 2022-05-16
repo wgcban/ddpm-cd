@@ -2,15 +2,14 @@
 
 [Paper]() |  [Project]()
 
-This is the offical implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models** by **Pytorch**.
+This is the offical **Pytorch** implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models**.
 
-## Usage
-### Environment
+## Environment
 ```python
 pip3 install -r requirement.txt
 ```
 
-# Training diffusion model with remote sensing data
+## Training diffusion model with remote sensing data
 ### Collect off-the-shelf remote sensing data to train diffusion model
 
 Dump all the remote sensing data sampled from Google Earth Engine and any other publically available remote sensing images to dataset folder or create a simlink. 
@@ -25,8 +24,8 @@ python ddpm_train.py --config config/ddpm_train.json -enable_wandb -log_eval
 
 In case, if you want to resume the training from previosely saved point, provide the path to saved model in ``path/resume_state``, else keep it as null.
 
-# Change Detection
-## Training
+## Change Detection
+### Training
 ### Download the datasets
 Download the change detection datasets from the following links. Place them inside your `datasets` folder.
 
@@ -62,7 +61,7 @@ Run the following code to start the training.
 
 The results will be saved in `experiments` and also upload to `wandb`.
 
-## Testing
+### Testing
 To obtain the predictions and performance metrics (iou, f1, and OA), first provide the path to pre-trained diffusion model here [`path`][`resume_state`] and path to trained change detection model (the best model) here [`path_cd`][`resume_state`] in `levir_test.json`, `whu_test.json`, `dsifn_test.json`, and `cdd_test.json`.
 
 Run the following code to start the training.
@@ -85,7 +84,7 @@ Run the following code to start the training.
 
 Predictions will be saved in `experiments` and performance metrics will be uploaded to wandb.
 
-# Pre-trained models & Train/Val/Test logs
+## Pre-trained models & Train/Val/Test logs
 ### Downalod links to pre-trained models
 - Pre-trained diffusion model: [`Click Here`](https://www.dropbox.com/sh/z6k5ixlhkpwgzt5/AAApBOGEUhHa4qZon0MxUfmua?dl=0)
 - Pre-trained change detection networks:
