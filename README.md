@@ -40,6 +40,30 @@ Then, update the paths to those folders here [`datasets`][`train`][`dataroot`], 
 ### Provide the path to pre-trained diffusion model
 Udate the path to pre-trained diffusion model weights (`*_gen.pth` and `*_opt.pth`) here [`path`][`resume_state`] in `levir.json`, `whu.json`, `dsifn.json`, and `cdd.json`..
 
+### Training the change detection network
+Run the following code to start the training.
+- Training on LEVIR-CD dataset:
+    - 
+    ```python
+    python ddpm_cd.py --config config/levir.json -enable_wandb -log_eval
+    ```
+- Training on WHU-CD dataset:
+    - 
+    ```python
+    python ddpm_cd.py --config config/whu.json -enable_wandb -log_eval
+    ```
+- Training on DSIFN-CD dataset:
+    - 
+    ```python
+    python ddpm_cd.py --config config/dsifn.json -enable_wandb -log_eval
+    ```
+- Training on CDD dataset:
+    - 
+    ```python
+    python ddpm_cd.py --config config/cdd.json -enable_wandb -log_eval
+    ```
+
+
 
 
 
