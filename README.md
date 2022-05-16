@@ -85,7 +85,7 @@ Run the following code to start the training.
 
 Predictions will be saved in `experiments` and performance metrics will be uploaded to wandb.
 
-## Donload pre-trained models
+## Donwload pre-trained models
 - Pre-trained diffusion model: [`Click Here`]()
 - Pre-trained change detection networks:
     - "t": [50]
