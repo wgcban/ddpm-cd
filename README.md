@@ -72,17 +72,42 @@ Run the following code to start the training.
     ```
 - Test on WHU-CD:
     ```python
-    python ddpm_cd.py --config config/whu.json --phase test -enable_wandb -log_eval
+    python ddpm_cd.py --config config/whu_test.json --phase test -enable_wandb -log_eval
     ```
 - Test on DSIFN-CD:
     ```python
-    python ddpm_cd.py --config config/dsifn.json --phase test -enable_wandb -log_eval
+    python ddpm_cd.py --config config/dsifn_test.json --phase test -enable_wandb -log_eval
     ```
 - Test on CDD:
     ```python
-    python ddpm_cd.py --config config/cdd.json --phase test -enable_wandb -log_eval
+    python ddpm_cd.py --config config/cdd_test.json --phase test -enable_wandb -log_eval
     ```
 
+Predictions will be saved in `experiments` and performance metrics will be uploaded to wandb.
+
+## Donload pre-trained models
+- Pre-trained diffusion model: [`Click Here`]()
+- Pre-trained change detection networks:
+    - "t": [50]
+                - LEVIR-CD [`cd-levir-50`]()
+                - WHU-CD [`cd-whu-50`]()
+                - DSIFN-CD [`cd-dsifn-50`]()
+                - CDD-CD [`cd-cdd-50`]()
+    - "t": [100]
+                - LEVIR-CD [`cd-levir-100`]()
+                - WHU-CD [`cd-whu-100`]()
+                - DSIFN-CD [`cd-dsifn-100`]()
+                - CDD-CD [`cd-cdd-100`]()
+    - "t": [50, 100]
+            - LEVIR-CD [`cd-levir-50-100`]()
+            - WHU-CD [`cd-whu-50-100`]()
+            - DSIFN-CD [`cd-dsifn-50-100`]()
+            - CDD-CD [`cd-cdd-50-100`]()
+    - "t": [50, 100, 400] (*Best Model*)
+        - LEVIR-CD [`cd-levir-50-100-400`]()
+        - WHU-CD [`cd-whu-50-100-400`]()
+        - DSIFN-CD [`cd-dsifn-50-100-400`]()
+        - CDD-CD [`cd-cdd-50-100-400`]()
 
 
 
