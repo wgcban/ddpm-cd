@@ -37,7 +37,8 @@ Download the change detection datasets from the following links. Place them insi
 
 Then, update the paths to those folders here [`datasets`][`train`][`dataroot`], [`datasets`][`val`][`dataroot`], [`datasets`][`test`][`dataroot`] in `levir.json`, `whu.json`, `dsifn.json`, and `cdd.json`.
 
-Also udate the path to pre-trained diffusion model weights here [`path`][`resume_state`].
+### Provide the path to pre-trained diffusion model
+Udate the path to pre-trained diffusion model weights (`*_gen.pth` and `*_opt.pth`) here [`path`][`resume_state`] in `levir.json`, `whu.json`, `dsifn.json`, and `cdd.json`..
 
 
 
