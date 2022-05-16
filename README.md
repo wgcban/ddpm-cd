@@ -26,9 +26,8 @@ python ddpm_train.py --config config/ddpm_train.json -enable_wandb -log_eval
 In case, if you want to resume the training from previosely saved point, provide the path to saved model in ``path/resume_state``, else keep it as null.
 
 # Training change detection network
-## Download change detection dataset
-Download the change detection datasets from the following links.
-Links to download datasets:
+### Download change detection datasets
+Download the change detection datasets from the following links. Place them inside your `datasets` folder.
 
 - [`LEVIR-CD`](https://www.dropbox.com/s/18fb5jo0npu5evm/LEVIR-CD256.zip?dl=0)
 - [`WHU-CD`](https://www.dropbox.com/s/r76a00jcxp5d3hl/WHU-CD-256.zip?dl=0)
@@ -36,7 +35,7 @@ Links to download datasets:
 - [`CDD`](https://www.dropbox.com/s/ls9fq5u61k8wxwk/CDD.zip?dl=0)
 
 
-Next, update the paths to those folders here [`datasets`][`train`][`dataroot`], [`datasets`][`val`][`dataroot`], [`datasets`][`test`][`dataroot`] in `levir.json`, `whu.json`, `dsifn.json`, and `cdd.json`.
+Then, update the paths to those folders here [`datasets`][`train`][`dataroot`], [`datasets`][`val`][`dataroot`], [`datasets`][`test`][`dataroot`] in `levir.json`, `whu.json`, `dsifn.json`, and `cdd.json`.
 
 Also udate the path to pre-trained diffusion model weights here [`path`][`resume_state`].
 
