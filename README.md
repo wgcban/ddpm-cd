@@ -4,8 +4,6 @@
 
 This is the offical implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models** by **Pytorch**.
 
-There are some implement details with paper description, which maybe different with actual `SR3` structure due to details missing.
-
 ## Usage
 ### Environment
 ```python
