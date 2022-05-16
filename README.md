@@ -25,8 +25,9 @@ python ddpm_train.py --config config/ddpm_train.json -enable_wandb -log_eval
 
 In case, if you want to resume the training from previosely saved point, provide the path to saved model in ``path/resume_state``, else keep it as null.
 
-# Training change detection network
-### Download change detection datasets
+# Change Detection
+## Training
+### Download the datasets
 Download the change detection datasets from the following links. Place them inside your `datasets` folder.
 
 - [`LEVIR-CD`](https://www.dropbox.com/s/18fb5jo0npu5evm/LEVIR-CD256.zip?dl=0)
@@ -61,7 +62,7 @@ Run the following code to start the training.
 
 The results will be saved in `experiments` and also uploaded to `wandb`.
 
-
+## Testing
 
 
 
