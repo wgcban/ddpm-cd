@@ -4,6 +4,11 @@
 
 This is the offical **Pytorch** implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models**.
 
+![image-20210228153142126](./imgs/samples.jpeg)
+
+## :arrow_forward:Method
+![image-20210228153142126](./imgs/method.jpeg)
+
 ## :arrow_forward:Environment
 ```bash
 conda create -n ddpm-cd python=3.9
