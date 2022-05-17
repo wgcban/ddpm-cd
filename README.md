@@ -133,6 +133,20 @@ Predictions will be saved in `experiments` and performance metrics will be uploa
 ### :low_brightness:Test results on `wandb`
 - [`LEVIR-WHU-DSIFN-CDD-Test-Results`](https://wandb.ai/wgcban/ddpm-RS-CDHead/reports/Change-Detection-Performance-on-Test-sets-of-LEVIR-CD-WHU-CD-DSIFN-CD-and-CDD--VmlldzoyMDE5NDg5?accessToken=6eikgovmk7ct25ar00eggsuslh8bzdz9e8215qn5xa0omqe5uo5u1jf4lh2liajx)
 
+## :arrow_forward:Results
+### :low_brightness:Quantitative
+![image-20210228153142126](./imgs/results.jpeg)
+
+### :low_brightness:Qualitative
+- LEVIR-CD
+    ![image-20210228153142126](./imgs/levir.jpeg)
+- WHU-CD
+    ![image-20210228153142126](./imgs/whu.jpeg)
+- DSIFN-CD
+    ![image-20210228153142126](./imgs/dsifn.jpeg)
+- CDD
+    ![image-20210228153142126](./imgs/cdd.jpeg)
+
 
 ## :arrow_forward:Citation
 I will update this later.
@@ -140,3 +154,5 @@ I will update this later.
 
 ## :arrow_forward:References
 - The code of diffusion model is from [`here`](https://github.com/Janspiry/Image-Super-Resolution-via-Iterative-Refinement).
+
+
