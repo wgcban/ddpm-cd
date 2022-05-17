@@ -1,4 +1,4 @@
-# Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models
+# DDPM-CD: Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models
 
 [`Paper`]() |  [`Project`]()
 
