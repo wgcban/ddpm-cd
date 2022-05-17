@@ -105,7 +105,7 @@ Run the following code to start the training.
 Predictions will be saved in `experiments` and performance metrics will be uploaded to wandb.
 
 ## :arrow_forward:Pre-trained models & Train/Val/Test logs
-### :low_brightness:Downalod links to pre-trained models
+### :low_brightness:Links to download pre-trained models
 - Pre-trained diffusion model: [`Click Here`](https://www.dropbox.com/sh/z6k5ixlhkpwgzt5/AAApBOGEUhHa4qZon0MxUfmua?dl=0)
 - Pre-trained change detection networks:
     - "t": [50, 100]
