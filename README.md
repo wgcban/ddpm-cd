@@ -135,17 +135,17 @@ Predictions will be saved in `experiments` and performance metrics will be uploa
 
 ## :arrow_forward:Results
 ### :low_brightness:Quantitative
-![image-20210228153142126](./imgs/results.jpeg)
+![image-20210228153142126](./imgs/results.png)
 
 ### :low_brightness:Qualitative
 - LEVIR-CD
-    ![image-20210228153142126](./imgs/levir.jpeg)
+    ![image-20210228153142126](./imgs/levir.png)
 - WHU-CD
-    ![image-20210228153142126](./imgs/whu.jpeg)
+    ![image-20210228153142126](./imgs/whu.png)
 - DSIFN-CD
-    ![image-20210228153142126](./imgs/dsifn.jpeg)
+    ![image-20210228153142126](./imgs/dsifn.png)
 - CDD
-    ![image-20210228153142126](./imgs/cdd.jpeg)
+    ![image-20210228153142126](./imgs/cdd.png)
 
 
 ## :arrow_forward:Citation
