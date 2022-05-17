@@ -15,7 +15,7 @@ conda activate ddpm-cd
 pip3 install -r requirement.txt
 ```
 
-## Training diffusion model with remote sensing data
+## :arrow_forward:Training diffusion model with remote sensing data
 ### Collect off-the-shelf remote sensing data to train diffusion model
 
 Dump all the remote sensing data sampled from Google Earth Engine and any other publically available remote sensing images to dataset folder or create a simlink. 
@@ -37,7 +37,7 @@ python ddpm_train.py --config config/ddpm_sampling.json --phase val
 ```
 The generated images will be saved in `experiments`.
 
-## Change Detection
+## :arrow_forward:Change Detection
 ### Training
 ### Download the datasets
 Download the change detection datasets from the following links. Place them inside your `datasets` folder.
@@ -97,7 +97,7 @@ Run the following code to start the training.
 
 Predictions will be saved in `experiments` and performance metrics will be uploaded to wandb.
 
-## Pre-trained models & Train/Val/Test logs
+## :arrow_forward:Pre-trained models & Train/Val/Test logs
 ### Downalod links to pre-trained models
 - Pre-trained diffusion model: [`Click Here`](https://www.dropbox.com/sh/z6k5ixlhkpwgzt5/AAApBOGEUhHa4qZon0MxUfmua?dl=0)
 - Pre-trained change detection networks:
@@ -127,9 +127,9 @@ Predictions will be saved in `experiments` and performance metrics will be uploa
 - [`LEVIR-WHU-DSIFN-CDD-Test-Results`](https://wandb.ai/wgcban/ddpm-RS-CDHead/reports/Change-Detection-Performance-on-Test-sets-of-LEVIR-CD-WHU-CD-DSIFN-CD-and-CDD--VmlldzoyMDE5NDg5?accessToken=6eikgovmk7ct25ar00eggsuslh8bzdz9e8215qn5xa0omqe5uo5u1jf4lh2liajx)
 
 
-## Citation
+## :arrow_forward:Citation
 I will update this later.
 
 
-## References
+## :arrow_forward:References
 - The code of diffusion model is from [`here`](https://github.com/Janspiry/Image-Super-Resolution-via-Iterative-Refinement).
