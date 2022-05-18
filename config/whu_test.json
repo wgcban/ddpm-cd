@@ -2,7 +2,7 @@
     "name": "ddpm-RS-CDHead-WHU-[test]",
     "phase": "train", // train or test
     "gpu_ids": [
-        9
+        0
     ],
 
     "path": { //set the paths

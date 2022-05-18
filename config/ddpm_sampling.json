@@ -2,7 +2,7 @@
     "name": "ddpm-sampling-remote-sensing-imgs",
     "phase": "val", // train or val
     "gpu_ids": [
-        2
+        0
     ],
     "path": { //set the path
         "log": "logs",
