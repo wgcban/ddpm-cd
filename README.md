@@ -154,22 +154,15 @@ Predictions will be saved in `experiments` and performance metrics will be uploa
 
 
 ## :arrow_forward:Citation
-```
+```bibtex
 @misc{https://doi.org/10.48550/arxiv.2206.11892,
   doi = {10.48550/ARXIV.2206.11892},
-  
   url = {https://arxiv.org/abs/2206.11892},
-  
   author = {Bandara, Wele Gedara Chaminda and Nair, Nithin Gopalakrishnan and Patel, Vishal M.},
-  
   keywords = {Computer Vision and Pattern Recognition (cs.CV), Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences},
-  
   title = {Remote Sensing Change Detection (Segmentation) using Denoising Diffusion Probabilistic Models},
-  
   publisher = {arXiv},
-  
   year = {2022},
-  
   copyright = {Creative Commons Attribution 4.0 International}
 }
 ```
