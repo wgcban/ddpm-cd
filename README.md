@@ -13,14 +13,13 @@
 *We fine-tune a light-weight change detection head which takes multi-level feature representations from the pre-trained diffusion model as inputs and outputs change prediction map.*
 
 ## :arrow_forward:Environment
+Install conda and create the environment using the provided `environment.yml` file:
 ```bash
-conda create -n ddpm-cd python=3.9
+conda env create -f environment.yml
 ```
+Make sure you activate the environment before starting the experiments:
 ```bash
 conda activate ddpm-cd
-```
-```python
-pip3 install -r requirement.txt
 ```
 
 ## :arrow_forward:Training diffusion model with remote sensing data
