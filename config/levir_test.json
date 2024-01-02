@@ -19,8 +19,10 @@
         "tb_logger": "tb_logger",
         "results": "results",
         "checkpoint": "checkpoint",
-        "resume_state": "experiments/ddpm-RS-CDHead_220502_122211/checkpoint/best_cd_model"
-        //"resume_state": "experiments/ddpm-RS-CDHead-LEVIR_220505_230443/checkpoint/best_cd_model" //t=50, 100
+        // "resume_state": "experiments/cd-levir-50-100-400/best_cd_model"
+        "resume_state": "experiments/cd-levir-50-100/best_cd_model"
+        // "resume_state": "experiments/ddpm-RS-CDHead_220502_122211/checkpoint/best_cd_model"
+        // "resume_state": "experiments/ddpm-RS-CDHead-LEVIR_220505_230443/checkpoint/best_cd_model" //t=50, 100
         //"resume_state": "experiments/ddpm-RS-CDHead_220502_082603/checkpoint/best_cd_model" //t=50
         //"resume_state": "experiments/ddpm-RS-CDHead_220502_083019/checkpoint/best_cd_model" //t=100
     },
@@ -61,7 +63,7 @@
         "loss_type": "ce",
         "output_cm_size": 256,
         "feat_type": "dec", //Options: 'enc'/'dec'
-        "t": [150]
+        "t": [50, 100]
     },
 
     "model": {

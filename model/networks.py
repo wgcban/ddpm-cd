@@ -6,7 +6,10 @@ from torch.nn import init
 from torch.nn import modules
 logger = logging.getLogger('base')
 from model.cd_modules.cd_head import cd_head
-from model.cd_modules.cd_head_v2 import cd_head_v2
+from model.cd_modules.cd_head_v2 import cd_head_v2, get_in_channels
+from thop import profile, clever_format
+import copy
+import time
 ####################
 # initialize
 ####################
@@ -146,4 +149,41 @@ def define_CD(opt):
         assert torch.cuda.is_available()
         netCD = nn.DataParallel(netCD)
     
+    ### Profiling ###
+    f_A, f_B = [], [] 
+    feat_scales = cd_model_opt['feat_scales'].copy()
+    feat_scales.sort(reverse=True)
+    h,w=8,8
+    for i in range(0, len(feat_scales)):
+        dim = get_in_channels([feat_scales[i]], diffusion_model_opt['unet']['inner_channel'], diffusion_model_opt['unet']['channel_multiplier'])
+        A = torch.randn(1,dim,h,w).cuda()
+        B = torch.randn(1,dim,h,w).cuda()
+        f_A.append(A)
+        f_B.append(B)
+        f_A.append(A)
+        f_B.append(B)
+        f_A.append(A)
+        f_B.append(B)
+        h*=2
+        w*=2
+    f_A_r = [ele for ele in reversed(f_A)]
+    f_B_r = [ele for ele in reversed(f_B)]
+
+    F_A=[]
+    F_B=[]
+    for t_i in range(0, len(cd_model_opt["t"])):
+        print(t_i)
+        F_A.append(f_A_r)
+        F_B.append(f_B_r)
+    flops, params = profile(copy.deepcopy(netCD).cuda(), inputs=(F_A,F_B,), verbose=False)
+    flops, params = clever_format([flops, params])
+    netGcopy = copy.deepcopy(netCD).cuda()
+    netGcopy.eval()
+    with torch.no_grad():
+        start = time.time()
+        _ = netGcopy(F_A, F_B)
+        end = time.time()
+    print('### Model Params: {} FLOPs: {} Time: {}ms ####'.format(params, flops, 1000*(end-start)))
+    del netGcopy, F_A, F_B, f_A_r, f_B_r, f_A, f_B
+    ### --- ###
     return netCD

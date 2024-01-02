@@ -45,10 +45,10 @@ class Block(nn.Module):
         self.block = nn.Sequential(
             nn.Conv2d(dim*len(time_steps), dim, 1)
             if len(time_steps)>1
-            else None,
+            else nn.Identity(),
             nn.ReLU()
             if len(time_steps)>1
-            else None,
+            else nn.Identity(),
             nn.Conv2d(dim, dim_out, 3, padding=1),
             nn.ReLU()
         )
@@ -100,9 +100,10 @@ class cd_head_v2(nn.Module):
             if isinstance(layer, Block):
                 f_A = feats_A[0][self.feat_scales[lvl]]
                 f_B = feats_B[0][self.feat_scales[lvl]]
-                for i in range(1, len(self.time_steps)):
-                    f_A = torch.cat((f_A, feats_A[i][self.feat_scales[lvl]]), dim=1)
-                    f_B = torch.cat((f_B, feats_B[i][self.feat_scales[lvl]]), dim=1)
+                if len(self.time_steps) > 1:
+                    for i in range(1, len(self.time_steps)):
+                        f_A = torch.cat((f_A, feats_A[i][self.feat_scales[lvl]]), dim=1)
+                        f_B = torch.cat((f_B, feats_B[i][self.feat_scales[lvl]]), dim=1)
     
                 diff = torch.abs( layer(f_A)  - layer(f_B) )
                 if lvl!=0:
