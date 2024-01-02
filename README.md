@@ -4,16 +4,16 @@
 
 > Offical **Pytorch** implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models**.
 
-## Motivation
+## 1. Motivation
 ![image-20210228153142126](./imgs/samples.jpeg)
 *Images generated from the pre-trained diffusion model trained on off-the-shelf remote sensing images.*
 
-## Method
+## 2. Method
 ![image-20210228153142126](./imgs/method.jpg)
 *We fine-tune a lightweight change classifier utilizing the feature representations produced by the pre-trained DDPM alongside change labels*
 
-## Usage
-### Requirements
+## 3. Usage
+### 3.1 Requirements
 Before using this repository, make sure you have the following prerequisites installed:
 
 - [Anaconda](https://www.anaconda.com/download/)
@@ -24,7 +24,7 @@ You can install PyTorch with the following [command](https://pytorch.org/get-sta
 conda install pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia
 ```
 
-### Installation
+### 3.2 Installation
 
 To get started, clone this repository:
 ```bash
@@ -41,34 +41,36 @@ Then activate the environment:
 conda activate ddpm-cd
 ```
 
-Download the datasets (LEVIR-CD, WHU-CD, DSIFN-CD, and CDD) and place them in the dataset folder.
+Download the datasets (LEVIR-CD, WHU-CD, DSIFN-CD, and CDD) and place them in the `dataset` folder. 
+
+If you wish to only test, download the pre-trained DDPM and fine-tuned DDPM-CD models and place them in the `experiments` folder.
 
 All the train-val-test statistics will be automatically upload to [`wandb`](https://wandb.ai/home), and please refer [`wandb-quick-start`](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart) documentation if you are not familiar with using `wandb`. 
 
-## :arrow_forward:Training diffusion model with remote sensing data
-### :low_brightness:Collect off-the-shelf remote sensing data to train diffusion model
+## 4. Pre-training DDPM
+### 4.1 Collect off-the-shelf remote sensing data to train diffusion model
 
 Dump all the remote sensing data sampled from Google Earth Engine and any other publically available remote sensing images to dataset folder or create a simlink. 
 
-### :low_brightness:Training/Resume unconditional diffusion model on remote sensing data
+### 4.2 Pre-train/resume unconditional DDPM
 
-We use ``ddpm_train.json`` to setup the configurations. Update the dataset ``name`` and ``dataroot`` in the json file. Then run the following command to start training the diffusion model. The results and log files will be save to ``experiments`` folder. Also, we upload all the metrics to [wandb](https://wandb.ai/home).
+We use `ddpm_train.json` to setup the configurations. Update the dataset `name` and `dataroot` in the json file. Then run the following command to start training the diffusion model. The results and log files will be save to ``experiments`` folder. Also, we upload all the metrics to [wandb](https://wandb.ai/home).
 
 ```python
 python ddpm_train.py --config config/ddpm_train.json -enable_wandb -log_eval
 ```
 
-In case, if you want to resume the training from previosely saved point, provide the path to saved model in ``path/resume_state``, else keep it as null.
+In case, if you want to resume the training from previosely saved point, provide the path to saved model in ``path/resume_state``, else keep it as `null`.
 
-### :low_brightness:Sampling from the diffusion model
-If you want generate samples from the diffusion model, first update the path to trained diffusion model in [`path`][`resume_state`]. Then run the following command.
+### 4.3 Sampling from the pre-trained DDPM
+If you want generate samples from the pre-trained DDPM, first update the path to trained diffusion model in [`path`][`resume_state`]. Then run the following command.
 ```python
 python ddpm_train.py --config config/ddpm_sampling.json --phase val
 ```
 The generated images will be saved in `experiments`.
 
-## :arrow_forward:Change Detection
-### :low_brightness:Download the datasets
+## 5. Fine-tuning for change detection
+### Download the change detection datasets
 Download the change detection datasets from the following links. Place them inside your `datasets` folder.
 
 - [`LEVIR-CD`](https://www.dropbox.com/s/18fb5jo0npu5evm/LEVIR-CD256.zip?dl=0)
@@ -82,7 +84,10 @@ Then, update the paths to those folders here [`datasets`][`train`][`dataroot`], 
 ### Provide the path to pre-trained diffusion model
 Udate the path to pre-trained diffusion model weights (`*_gen.pth` and `*_opt.pth`) here [`path`][`resume_state`] in `levir.json`, `whu.json`, `dsifn.json`, and `cdd.json`..
 
-### :low_brightness:Training the change detection network
+### Indicate time-steps used for feature extraction
+Indicate the time-steps using to extract feature representations in [`model_cd`][`t`]. As shown in the ablation section of the paper, our best model is obtained with time-steps: {50,100,400}. However, time-steps of {50,100} works well too.
+
+### Start fine-tuning for change detection
 Run the following code to start the training.
 - Training on LEVIR-CD:
     ```python
@@ -103,8 +108,8 @@ Run the following code to start the training.
 
 The results will be saved in `experiments` and also upload to `wandb`.
 
-### :low_brightness:Testing
-To obtain the predictions and performance metrics (iou, f1, and OA), first provide the path to pre-trained diffusion model here [`path`][`resume_state`] and path to trained change detection model (the best model) here [`path_cd`][`resume_state`] in `levir_test.json`, `whu_test.json`, `dsifn_test.json`, and `cdd_test.json`.
+## 6. Testing
+To obtain the predictions and performance metrics (IoU, F1, and OA), first provide the path to pre-trained diffusion model here [`path`][`resume_state`] and path to trained change detection model (the best model) here [`path_cd`][`resume_state`] in `levir_test.json`, `whu_test.json`, `dsifn_test.json`, and `cdd_test.json`. Also make sure you specify the time steps used in fine-tuning here: [`model_cd`][`t`].
 
 Run the following code to start the training.
 - Test on LEVIR-CD:
@@ -126,10 +131,12 @@ Run the following code to start the training.
 
 Predictions will be saved in `experiments` and performance metrics will be uploaded to wandb.
 
-## :arrow_forward:Pre-trained models & Train/Val/Test logs
-### :low_brightness:Links to download pre-trained models
-- Pre-trained diffusion model: [`Dropbox`](https://www.dropbox.com/sh/z6k5ixlhkpwgzt5/AAApBOGEUhHa4qZon0MxUfmua?dl=0)
-- Pre-trained change detection networks:
+## 7. Links to download pre-trained models
+### 7.1 Pre-trianed DDPM
+Pre-trained diffusion model can be download from: [`Dropbox`](https://www.dropbox.com/sh/z6k5ixlhkpwgzt5/AAApBOGEUhHa4qZon0MxUfmua?dl=0)
+
+### 7.2 Fine-tuned DDPM-CD models
+Fine-tunes chande detection networks can be download from following links:
     - "t": [50, 100]
         - LEVIR-CD [`Dropbox-cd-levir-50-100`](https://www.dropbox.com/sh/ie9rapb1j2zgvb7/AAALkpLS-tvngTb4HXqAcbbTa?dl=0)
         - WHU-CD [`Dropbox-cd-whu-50-100`](https://www.dropbox.com/sh/9idrobnmhufo1e7/AABRf38iq-wE7plKZZmwFywva?dl=0)
@@ -146,25 +153,26 @@ Predictions will be saved in `experiments` and performance metrics will be uploa
         - DSIFN-CD [`Dropbox-cd-dsifn-50-100-400-650`](https://www.dropbox.com/sh/ekj7kwsohhnjico/AADuz0vBtxCCrYgdgOCG3LX5a?dl=0)
         - CDD-CD [`Dropbox-cd-cdd-50-100-400-650`](https://www.dropbox.com/sh/a8dj1i8pnexd5yu/AADnmBGT4VdGY8aZMo7enfS7a?dl=0)
  
- :boom: If you face a problem when downloading from the DropBox try one of the following options:
+ ### 7.2 Downloading from GoogleDrive/GitHub
+ If you face a problem when downloading from the DropBox try one of the following options:
  - [GoogleDrive] All pre-trained models in **GooleDrive**: [GoogleDrive-pretrianed-models](https://drive.google.com/file/d/1RXWtGdSNCBEAf7nr61uNyZP6HwNl_Zyi/view?usp=sharing)
  - [GitHub] [Pre-trained-models in GitHub](https://github.com/wgcban/ddpm-cd/releases/tag/initial_release)
  
 
-### :low_brightness:Train/Val Reports on `wandb`
+### 7.3 Train/Val Reports on `wandb`
 - [`LEVIR-CD-Train-Val-Reports-Wandb`](https://wandb.ai/wgcban/ddpm-RS-CDHead/reports/Change-Detection-Results-on-LEVIR-CD-Dataset--VmlldzoyMDE5MzIz?accessToken=3hubg8q23d3527klbojjdhklo8h66k5k1acrly6jtoxd7du35vwyci9dwv8urmin)
 - [`WHU-CD-Train-Val-reports-Wandb`](https://wandb.ai/wgcban/ddpm-RS-CDHead/reports/Change-Detection-on-WHU-CD-Dataset--VmlldzoyMDE5NDA0?accessToken=5d8a9q6g008ct94lx5171knen1dd9xpptzohe92ic65rx3wflkciq1rhbp4bozca)
 - [`DSIFN-CD-Train-Val-Reports-Wandb`](https://wandb.ai/wgcban/ddpm-RS-CDHead/reports/Change-Detection-on-DSIFN-CD-Dataset--VmlldzoyMDE5NDMy?accessToken=hfef99pxr03pi4zxmcw3jkpo2na1sd1c5t7stai2vl76908fnh3wnrhcy4mfoaae)
 - [`CDD-CD-Train-Val-Reports-Wandb`](https://wandb.ai/wgcban/ddpm-RS-CDHead/reports/Change-Detection-on-CDD-Dataset--VmlldzoyMDE5NDQw?accessToken=l4omatpi7jng6mw32hp7oh0wkqet8jne3wkqrb6hxigpjluv4yy9yzdir62ics9y)
 
-### :low_brightness:Test results on `wandb`
+### 7.4 Test results on `wandb`
 - [`LEVIR-WHU-DSIFN-CDD-Test-Results`](https://wandb.ai/wgcban/ddpm-RS-CDHead/reports/Change-Detection-Performance-on-Test-sets-of-LEVIR-CD-WHU-CD-DSIFN-CD-and-CDD--VmlldzoyMDE5NDg5?accessToken=6eikgovmk7ct25ar00eggsuslh8bzdz9e8215qn5xa0omqe5uo5u1jf4lh2liajx)
 
-## :arrow_forward:Results
-### :low_brightness:Quantitative
+## 8. Results
+### 8.1 Quantitative
 ![image-20210228153142126](./imgs/results.png)
 
-### :low_brightness:Qualitative
+### 8.2 Qualitative
 - LEVIR-CD
     ![image-20210228153142126](./imgs/levir.png)
 - WHU-CD
@@ -175,7 +183,7 @@ Predictions will be saved in `experiments` and performance metrics will be uploa
     ![image-20210228153142126](./imgs/cdd.png)
 
 
-## :arrow_forward:Citation
+## 9. Citation
 ```bibtex
 @misc{https://doi.org/10.48550/arxiv.2206.11892,
   doi = {10.48550/ARXIV.2206.11892},
@@ -189,8 +197,7 @@ Predictions will be saved in `experiments` and performance metrics will be uploa
 }
 ```
 
-
-## :arrow_forward:References
+## 10. References
 - The code of diffusion model is from [`here`](https://github.com/Janspiry/Image-Super-Resolution-via-Iterative-Refinement).
 
 
