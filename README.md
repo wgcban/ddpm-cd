@@ -2,7 +2,7 @@
 
 [`Paper`](https://arxiv.org/abs/2206.11892) |  [`Project`](https://www.wgcban.com/research#h.ar24vwqlm021)
 
-> Offical **Pytorch** implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models**.
+> Offical Pytorch implementation of *Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models*.
 
 ## 1. Motivation & Contribution
 ![image-20210228153142126](./imgs/samples.jpeg)
@@ -13,7 +13,7 @@
 
 ## 2. Method
 ![image-20210228153142126](./imgs/method.jpg)
-We fine-tune a lightweight change classifier utilizing the feature representations produced by the pre-trained DDPM alongside change labels
+- We fine-tune a lightweight change classifier utilizing the feature representations produced by the pre-trained DDPM alongside change labels
 
 ## 3. Usage
 ### 3.1 Requirements
@@ -44,18 +44,18 @@ Then activate the environment:
 conda activate ddpm-cd
 ```
 
-Download the datasets (LEVIR-CD, WHU-CD, DSIFN-CD, and CDD) and place them in the `dataset` folder. **See Section 5.1 for download links.**
+Download the datasets and place them in the `dataset` folder. **->[See Section 5.1 for download links.](https://github.com/wgcban/ddpm-cd/tree/master#51-download-the-change-detection-datasets)**
 
-If you wish to only test, download the pre-trained DDPM and fine-tuned DDPM-CD models and place them in the `experiments` folder. **See Section 7 for links.**
+If you wish to only test, download the pre-trained DDPM and fine-tuned DDPM-CD models and place them in the `experiments` folder. **->[See Section 7 for links.](https://github.com/wgcban/ddpm-cd#7-links-to-download-pre-trained-models)**
 
 All the train-val-test statistics will be automatically upload to [`wandb`](https://wandb.ai/home), and please refer [`wandb-quick-start`](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart) documentation if you are not familiar with using `wandb`. 
 
 ## 4. Pre-training DDPM
 ### 4.1 Collect off-the-shelf remote sensing data to train diffusion model
 
-Dump all the remote sensing data sampled from Google Earth Engine and any other publically available remote sensing images to dataset folder or create a simlink. 
+Dump all the remote sensing data sampled from Google Earth Engine and any other publically available remote sensing images to dataset folder or create a [simlink](https://www.geeksforgeeks.org/python-os-symlink-method/). 
 
-### 4.2 Pre-train/resume unconditional DDPM
+### 4.2 Pre-train/resume (unconditional) DDPM
 
 We use `ddpm_train.json` to setup the configurations. Update the dataset `name` and `dataroot` in the json file. Then run the following command to start training the diffusion model. The results and log files will be save to ``experiments`` folder. Also, we upload all the metrics to [wandb](https://wandb.ai/home).
 
@@ -140,21 +140,23 @@ Pre-trained diffusion model can be download from: [`Dropbox`](https://www.dropbo
 
 ### 7.2 Fine-tuned DDPM-CD models
 Fine-tunes chande detection networks can be download from following links:
-    - "t": [50, 100]
-        - LEVIR-CD [`Dropbox-cd-levir-50-100`](https://www.dropbox.com/sh/ie9rapb1j2zgvb7/AAALkpLS-tvngTb4HXqAcbbTa?dl=0)
-        - WHU-CD [`Dropbox-cd-whu-50-100`](https://www.dropbox.com/sh/9idrobnmhufo1e7/AABRf38iq-wE7plKZZmwFywva?dl=0)
-        - DSIFN-CD [`Dropbox-cd-dsifn-50-100`](https://www.dropbox.com/sh/001czxn335bul5g/AACRaR-nqQNNHEge6iSH_z-6a?dl=0)
-        - CDD-CD [`Dropbox-cd-cdd-50-100`](https://www.dropbox.com/sh/62wsy9cl8xizx2h/AAB5Dmu-PuOVAfIBugGqlsd8a?dl=0)
-    - "t": [50, 100, 400] (*Best Model*)
-        - LEVIR-CD [`Dropbox-cd-levir-50-100-400`](https://www.dropbox.com/sh/sx0aopz230lbuwc/AADKpwP30OHvtYub9FYTyk53a?dl=0)
-        - WHU-CD [`Dropbox-cd-whu-50-100-400`](https://www.dropbox.com/sh/l8iuzb2tudb3yrk/AAA7aZwb5eM12SamCXPh7R-Ra?dl=0)
-        - DSIFN-CD [`Dropbox-cd-dsifn-50-100-400`](https://www.dropbox.com/sh/ekj7kwsohhnjico/AADuz0vBtxCCrYgdgOCG3LX5a?dl=0)
-        - CDD-CD [`Dropbox-cd-cdd-50-100-400`](https://www.dropbox.com/sh/a8dj1i8pnexd5yu/AADnmBGT4VdGY8aZMo7enfS7a?dl=0)
-    - "t": [50, 100, 400, 650]
-        - LEVIR-CD [`Dropbox-cd-levir-50-100-400-650`](https://www.dropbox.com/sh/sx0aopz230lbuwc/AADKpwP30OHvtYub9FYTyk53a?dl=0)
-        - WHU-CD [`Dropbox-cd-whu-50-100-400-650`](https://www.dropbox.com/sh/l8iuzb2tudb3yrk/AAA7aZwb5eM12SamCXPh7R-Ra?dl=0)
-        - DSIFN-CD [`Dropbox-cd-dsifn-50-100-400-650`](https://www.dropbox.com/sh/ekj7kwsohhnjico/AADuz0vBtxCCrYgdgOCG3LX5a?dl=0)
-        - CDD-CD [`Dropbox-cd-cdd-50-100-400-650`](https://www.dropbox.com/sh/a8dj1i8pnexd5yu/AADnmBGT4VdGY8aZMo7enfS7a?dl=0)
+- "t": [50, 100]
+    - LEVIR-CD [`Dropbox-cd-levir-50-100`](https://www.dropbox.com/sh/ie9rapb1j2zgvb7/AAALkpLS-tvngTb4HXqAcbbTa?dl=0)
+    - WHU-CD [`Dropbox-cd-whu-50-100`](https://www.dropbox.com/sh/9idrobnmhufo1e7/AABRf38iq-wE7plKZZmwFywva?dl=0)
+    - DSIFN-CD [`Dropbox-cd-dsifn-50-100`](https://www.dropbox.com/sh/001czxn335bul5g/AACRaR-nqQNNHEge6iSH_z-6a?dl=0)
+    - CDD-CD [`Dropbox-cd-cdd-50-100`](https://www.dropbox.com/sh/62wsy9cl8xizx2h/AAB5Dmu-PuOVAfIBugGqlsd8a?dl=0)
+
+- "t": [50, 100, 400] (*Best Model*)
+    - LEVIR-CD [`Dropbox-cd-levir-50-100-400`](https://www.dropbox.com/sh/sx0aopz230lbuwc/AADKpwP30OHvtYub9FYTyk53a?dl=0)
+    - WHU-CD [`Dropbox-cd-whu-50-100-400`](https://www.dropbox.com/sh/l8iuzb2tudb3yrk/AAA7aZwb5eM12SamCXPh7R-Ra?dl=0)
+    - DSIFN-CD [`Dropbox-cd-dsifn-50-100-400`](https://www.dropbox.com/sh/ekj7kwsohhnjico/AADuz0vBtxCCrYgdgOCG3LX5a?dl=0)
+    - CDD-CD [`Dropbox-cd-cdd-50-100-400`](https://www.dropbox.com/sh/a8dj1i8pnexd5yu/AADnmBGT4VdGY8aZMo7enfS7a?dl=0)
+
+- "t": [50, 100, 400, 650]
+    - LEVIR-CD [`Dropbox-cd-levir-50-100-400-650`](https://www.dropbox.com/sh/sx0aopz230lbuwc/AADKpwP30OHvtYub9FYTyk53a?dl=0)
+    - WHU-CD [`Dropbox-cd-whu-50-100-400-650`](https://www.dropbox.com/sh/l8iuzb2tudb3yrk/AAA7aZwb5eM12SamCXPh7R-Ra?dl=0)
+    - DSIFN-CD [`Dropbox-cd-dsifn-50-100-400-650`](https://www.dropbox.com/sh/ekj7kwsohhnjico/AADuz0vBtxCCrYgdgOCG3LX5a?dl=0)
+    - CDD-CD [`Dropbox-cd-cdd-50-100-400-650`](https://www.dropbox.com/sh/a8dj1i8pnexd5yu/AADnmBGT4VdGY8aZMo7enfS7a?dl=0)
  
  ### 7.2 Downloading from GoogleDrive/GitHub
  If you face a problem when downloading from the DropBox try one of the following options:
