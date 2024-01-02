@@ -4,23 +4,46 @@
 
 > Offical **Pytorch** implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models**.
 
-## :arrow_forward:Motivation
+## Motivation
 ![image-20210228153142126](./imgs/samples.jpeg)
-*Images generated from the diffusion model trained on off-the-shelf remote sensing images. The generated images contain objects that we commonly see in real remote sensing images, such as buildings, trees, roads, vegetation, water surfaces, etc., demonstrating the powerful ability of the diffusion models to extract key semantics that can be further used in remote sensing change detection.*
+*Images generated from the pre-trained diffusion model trained on off-the-shelf remote sensing images.*
 
-## :arrow_forward:Method
+## Method
 ![image-20210228153142126](./imgs/method.jpg)
-*We fine-tune a light-weight change detection head which takes multi-level feature representations from the pre-trained diffusion model as inputs and outputs change prediction map.*
+*We fine-tune a lightweight change classifier utilizing the feature representations produced by the pre-trained DDPM alongside change labels*
 
-## :arrow_forward:Environment
-Install conda and create the environment using the provided `environment.yml` file:
+## Usage
+### Requirements
+Before using this repository, make sure you have the following prerequisites installed:
+
+- [Anaconda](https://www.anaconda.com/download/)
+- [PyTorch](https://pytorch.org)
+
+You can install PyTorch with the following [command](https://pytorch.org/get-started/locally/) (in Linux OS):
+```bash
+conda install pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia
+```
+
+### Installation
+
+To get started, clone this repository:
+```bash
+git clone https://github.com/wgcban/ddpm-cd.git
+```
+
+Next, create the [conda](https://docs.conda.io/projects/conda/en/stable/) environment named `ddpm-cd` by executing the following command:
 ```bash
 conda env create -f environment.yml
 ```
-Make sure you activate the environment before starting the experiments:
+
+Then activate the environment:
 ```bash
 conda activate ddpm-cd
 ```
+
+Download the datasets (LEVIR-CD, WHU-CD, DSIFN-CD, and CDD) and place them in the dataset folder.
+
+All the train-val-test statistics will be automatically upload to [`wandb`](https://wandb.ai/home), and please refer [`wandb-quick-start`](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart) documentation if you are not familiar with using `wandb`. 
 
 ## :arrow_forward:Training diffusion model with remote sensing data
 ### :low_brightness:Collect off-the-shelf remote sensing data to train diffusion model
