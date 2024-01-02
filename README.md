@@ -9,7 +9,7 @@ This is the offical **Pytorch** implementation of **Remote Sensing Change Detect
 *Images generated from the diffusion model trained on off-the-shelf remote sensing images. The generated images contain objects that we commonly see in real remote sensing images, such as buildings, trees, roads, vegetation, water surfaces, etc., demonstrating the powerful ability of the diffusion models to extract key semantics that can be further used in remote sensing change detection.*
 
 ## :arrow_forward:Method
-![image-20210228153142126](./imgs/method.jpeg)
+![image-20210228153142126](./imgs/method.jpg)
 *We fine-tune a light-weight change detection head which takes multi-level feature representations from the pre-trained diffusion model as inputs and outputs change prediction map.*
 
 ## :arrow_forward:Environment
