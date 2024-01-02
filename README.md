@@ -2,7 +2,7 @@
 
 [`Paper`](https://arxiv.org/abs/2206.11892) |  [`Project`](https://www.wgcban.com/research#h.ar24vwqlm021)
 
-This is the offical **Pytorch** implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models**.
+> Offical **Pytorch** implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models**.
 
 ## :arrow_forward:Motivation
 ![image-20210228153142126](./imgs/samples.jpeg)
