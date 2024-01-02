@@ -4,13 +4,16 @@
 
 > Offical **Pytorch** implementation of **Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models**.
 
-## 1. Motivation
+## 1. Motivation & Contribution
 ![image-20210228153142126](./imgs/samples.jpeg)
-*Images generated from the pre-trained diffusion model trained on off-the-shelf remote sensing images.*
+- Images generated from the pre-trained diffusion model trained on off-the-shelf remote sensing images.
+- The generated images exhibit common objects typically observed in real remote sensing imagery, including buildings, trees, roads, vegetation, water surfaces, etc.
+- This showcases the remarkable capability of diffusion models to grasp essential semantics from the training dataset.
+- Although our primary focus isn't image synthesis, we explore the effectiveness of DDPM as a feature extractor for change detection.
 
 ## 2. Method
 ![image-20210228153142126](./imgs/method.jpg)
-*We fine-tune a lightweight change classifier utilizing the feature representations produced by the pre-trained DDPM alongside change labels*
+We fine-tune a lightweight change classifier utilizing the feature representations produced by the pre-trained DDPM alongside change labels
 
 ## 3. Usage
 ### 3.1 Requirements
@@ -41,9 +44,9 @@ Then activate the environment:
 conda activate ddpm-cd
 ```
 
-Download the datasets (LEVIR-CD, WHU-CD, DSIFN-CD, and CDD) and place them in the `dataset` folder. 
+Download the datasets (LEVIR-CD, WHU-CD, DSIFN-CD, and CDD) and place them in the `dataset` folder. **See Section 5.1 for download links.**
 
-If you wish to only test, download the pre-trained DDPM and fine-tuned DDPM-CD models and place them in the `experiments` folder.
+If you wish to only test, download the pre-trained DDPM and fine-tuned DDPM-CD models and place them in the `experiments` folder. **See Section 7 for links.**
 
 All the train-val-test statistics will be automatically upload to [`wandb`](https://wandb.ai/home), and please refer [`wandb-quick-start`](https://wandb.ai/quickstart?utm_source=app-resource-center&utm_medium=app&utm_term=quickstart) documentation if you are not familiar with using `wandb`. 
 
@@ -70,7 +73,7 @@ python ddpm_train.py --config config/ddpm_sampling.json --phase val
 The generated images will be saved in `experiments`.
 
 ## 5. Fine-tuning for change detection
-### Download the change detection datasets
+### 5.1 Download the change detection datasets
 Download the change detection datasets from the following links. Place them inside your `datasets` folder.
 
 - [`LEVIR-CD`](https://www.dropbox.com/s/18fb5jo0npu5evm/LEVIR-CD256.zip?dl=0)
@@ -81,13 +84,13 @@ Download the change detection datasets from the following links. Place them insi
 
 Then, update the paths to those folders here [`datasets`][`train`][`dataroot`], [`datasets`][`val`][`dataroot`], [`datasets`][`test`][`dataroot`] in `levir.json`, `whu.json`, `dsifn.json`, and `cdd.json`.
 
-### Provide the path to pre-trained diffusion model
+### 5.2 Provide the path to pre-trained diffusion model
 Udate the path to pre-trained diffusion model weights (`*_gen.pth` and `*_opt.pth`) here [`path`][`resume_state`] in `levir.json`, `whu.json`, `dsifn.json`, and `cdd.json`..
 
-### Indicate time-steps used for feature extraction
+### 5.3 Indicate time-steps used for feature extraction
 Indicate the time-steps using to extract feature representations in [`model_cd`][`t`]. As shown in the ablation section of the paper, our best model is obtained with time-steps: {50,100,400}. However, time-steps of {50,100} works well too.
 
-### Start fine-tuning for change detection
+### 5.4 Start fine-tuning for change detection
 Run the following code to start the training.
 - Training on LEVIR-CD:
     ```python
