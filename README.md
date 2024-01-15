@@ -8,7 +8,7 @@
 > [Latest Version of the Paper](https://arxiv.org/abs/2206.11892)
 
 ### Updates:
-- Paper-v3: We have (completely) revised the wrting of our paper. Please refer to [v3 on arxiv](https://arxiv.org/abs/2206.11892v3). 
+- :exclamation: Paper-v3: We have (completely) revised the wrting of our paper. Please refer to [v3 on arxiv](https://arxiv.org/abs/2206.11892v3). 
 
 ## 1. Motivation & Contribution
 ![image-20210228153142126](./imgs/samples.jpeg)
