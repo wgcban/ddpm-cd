@@ -186,27 +186,27 @@ Fine-tunes chande detection networks can be download from following links:
 ### 8.2 Qualitative
 - LEVIR-CD
 
-![image-20210228153142126](./imgs/levir.png)
+    ![image-20210228153142126](./imgs/levir.png)
 
-(a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
+    > (a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
 
 - WHU-CD
 
-![image-20210228153142126](./imgs/whu.png)
+    ![image-20210228153142126](./imgs/whu.png)
 
-(a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
+    > (a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
 
 - DSIFN-CD
 
-![image-20210228153142126](./imgs/dsifn.png)
+    ![image-20210228153142126](./imgs/dsifn.png)
 
-(a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
+    > (a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
 
 - CDD
 
-![image-20210228153142126](./imgs/cdd.png)
+    ![image-20210228153142126](./imgs/cdd.png)
 
-(a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
+    > (a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
 
 
 
