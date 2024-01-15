@@ -185,26 +185,51 @@ Fine-tunes chande detection networks can be download from following links:
 
 ### 8.2 Qualitative
 - LEVIR-CD
-    ![image-20210228153142126](./imgs/levir.png)
+
+![image-20210228153142126](./imgs/levir.png)
+
+(a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
+
 - WHU-CD
-    ![image-20210228153142126](./imgs/whu.png)
+
+![image-20210228153142126](./imgs/whu.png)
+
+(a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
+
 - DSIFN-CD
-    ![image-20210228153142126](./imgs/dsifn.png)
+
+![image-20210228153142126](./imgs/dsifn.png)
+
+(a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
+
 - CDD
-    ![image-20210228153142126](./imgs/cdd.png)
+
+![image-20210228153142126](./imgs/cdd.png)
+
+(a) Pre-change image, (b) Post-change image, (c) FC-EF, (d) FC-Siam-diff, (e) FC-Siam- conc, (f) DT-SCN, (g) BIT, (h) ChangeFormer, (i) DDPM-CD (ours), and (j) Ground-truth
+
 
 
 ## 9. Citation
 ```bibtex
-@misc{https://doi.org/10.48550/arxiv.2206.11892,
-  doi = {10.48550/ARXIV.2206.11892},
-  url = {https://arxiv.org/abs/2206.11892},
-  author = {Bandara, Wele Gedara Chaminda and Nair, Nithin Gopalakrishnan and Patel, Vishal M.},
-  keywords = {Computer Vision and Pattern Recognition (cs.CV), Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences},
-  title = {Remote Sensing Change Detection (Segmentation) using Denoising Diffusion Probabilistic Models},
-  publisher = {arXiv},
-  year = {2022},
-  copyright = {Creative Commons Attribution 4.0 International}
+@misc{bandara2024ddpmcdv2,
+    title = {Remote Sensing Change Detection (Segmentation) using Denoising Diffusion Probabilistic Models},
+    author = {Bandara, Wele Gedara Chaminda and Nair, Nithin Gopalakrishnan and Patel, Vishal M.},
+    year = {2022},
+    eprint={2206.11892},
+    archivePrefix={arXiv},
+    primaryClass={cs.CV}
+      doi = {10.48550/ARXIV.2206.11892},
+}
+```
+```bibtex
+@misc{bandara2024ddpmcdv3,
+      title={DDPM-CD: Denoising Diffusion Probabilistic Models as Feature Extractors for Change Detection}, 
+      author={Wele Gedara Chaminda Bandara and Nithin Gopalakrishnan Nair and Vishal M. Patel},
+      year={2024},
+      eprint={2206.11892},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
 }
 ```
 
