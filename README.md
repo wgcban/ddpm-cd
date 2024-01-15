@@ -12,6 +12,9 @@
 
 ## 1. Motivation & Contribution
 ![image-20210228153142126](./imgs/samples.jpeg)
+
+> Images sampled from the DDPM model pre-trained on off-the-shelf remote sensing images.
+
 - Images generated from the pre-trained diffusion model trained on off-the-shelf remote sensing images.
 - The generated images exhibit common objects typically observed in real remote sensing imagery, including buildings, trees, roads, vegetation, water surfaces, etc.
 - This showcases the remarkable capability of diffusion models to grasp essential semantics from the training dataset.
