@@ -187,7 +187,7 @@ Fine-tunes chande detection networks can be download from following links:
 ### 8.1 Quantitative
 ![image-20210228153142126](./imgs/results.png)
 
-> The average quantitative change detection results on the LEVIR-CD, WHU-CD, DSIFN-CD, and CDD test- sets. “-” indicates not reported or not available to us. (IN1k) indicates pre-training process is initialized with the ImageNet pre-trained weights. IN1k, IBSD, and GE refers to ImageNet1k [92], Inria Building Segmentation Dataset [107], and Google Earth.
+> The average quantitative change detection results on the LEVIR-CD, WHU-CD, DSIFN-CD, and CDD test- sets. “-” indicates not reported or not available to us. (IN1k) indicates pre-training process is initialized with the ImageNet pre-trained weights. IN1k, IBSD, and GE refers to ImageNet1k, Inria Building Segmentation Dataset, and Google Earth.
 
 
 ### 8.2 Qualitative
