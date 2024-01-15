@@ -222,18 +222,19 @@ Fine-tunes chande detection networks can be download from following links:
     year = {2022},
     eprint={2206.11892},
     archivePrefix={arXiv},
-    primaryClass={cs.CV}
-      doi = {10.48550/ARXIV.2206.11892},
+    primaryClass={cs.CV},
+    doi = {10.48550/ARXIV.2206.11892},
 }
 ```
 ```bibtex
 @misc{bandara2024ddpmcdv3,
-      title={DDPM-CD: Denoising Diffusion Probabilistic Models as Feature Extractors for Change Detection}, 
-      author={Wele Gedara Chaminda Bandara and Nithin Gopalakrishnan Nair and Vishal M. Patel},
-      year={2024},
-      eprint={2206.11892},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+    title={DDPM-CD: Denoising Diffusion Probabilistic Models as Feature Extractors for Change Detection}, 
+    author={Wele Gedara Chaminda Bandara and Nithin Gopalakrishnan Nair and Vishal M. Patel},
+    year={2024},
+    eprint={2206.11892},
+    archivePrefix={arXiv},
+    primaryClass={cs.CV},
+    doi = {10.48550/ARXIV.2206.11892},
 }
 ```
 
