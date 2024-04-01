@@ -10,6 +10,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 from cnn_layer import *
+from slic2gcn import *
 
 
 def get_in_channels(feat_scales, inner_channel, channel_multiplier):
@@ -111,9 +112,9 @@ class cd_gcn_head(nn.Module):
         for layer in self.decoder:
             if isinstance(layer, Block):
                 f_A = feats_A[0][self.feat_scales[lvl]]
-                f_A = tensor2slic(f_A)
+                f_A = SuperpixelEncoder(f_A)
                 f_B = feats_B[0][self.feat_scales[lvl]]
-                f_B = tensor2slic(f_B)
+                f_B = SuperpixelEncoder(f_B)
                 if len(self.time_steps) > 1:
                     for i in range(1, len(self.time_steps)):
                         f_A = torch.cat((f_A, feats_A[i][self.feat_scales[lvl]]), dim=1)
