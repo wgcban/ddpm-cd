@@ -10,8 +10,31 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 
-class SuperpixelSegmentation:
+def get_in_channels(feat_scales, inner_channel, channel_multiplier):
+    """
+    Get the number of input layers to the change detection head.
+    """
+    in_channels = 0
+    for scale in feat_scales:
+        if scale < 3: #256 x 256
+            in_channels += inner_channel*channel_multiplier[0]
+        elif scale < 6: #128 x 128
+            in_channels += inner_channel*channel_multiplier[1]
+        elif scale < 9: #64 x 64
+            in_channels += inner_channel*channel_multiplier[2]
+        elif scale < 12: #32 x 32
+            in_channels += inner_channel*channel_multiplier[3]
+        elif scale < 15: #16 x 16
+            in_channels += inner_channel*channel_multiplier[4]
+        else:
+            print('Unbounded number for feat_scales. 0<=feat_scales<=14')
+    return in_channels
+
+
+class SuperpixelSegmentation(nn.Module):
+    # TODO: add transform slic result into a tensor (B, C, H, W) -> (B, 1, sqrt(H), sqrt(W))
     def __init__(self, n_segments=100, compactness=10.0, sigma=1):
+        super(SuperpixelSegmentation, self).__init__()
         self.n_segments = n_segments
         self.compactness = compactness
         self.sigma = sigma
@@ -21,6 +44,7 @@ class SuperpixelSegmentation:
         labels = slic(image_np, n_segments=self.n_segments, compactness=self.compactness, sigma=self.sigma)
         labels_tensor = torch.from_numpy(labels).long()
         return labels_tensor
+
 
 class cd_gcn_head(nn.Module):
     """
@@ -37,17 +61,3 @@ class cd_gcn_head(nn.Module):
 
     def forward(self, feats_A, feats_B):
         pass
-
-# 初始化超像素分割器
-segmenter = SuperpixelSegmentation(n_segments=100, compactness=10.0, sigma=1)
-
-# 生成随机的 Tensor 作为输入
-input_tensor = torch.randn(1, 3, 256, 256)  # 生成一个大小为 256x256 的 RGB 图像
-
-# 对图像进行超像素分割
-segmented_image = segmenter.segment(input_tensor)
-print(segmented_image.size())
-
-# 显示分割结果
-plt.imshow(segmented_image.squeeze(), cmap='viridis')
-plt.show()
