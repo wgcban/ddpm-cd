@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.functional as F
 from torch_geometric.data import Data
 from torch_geometric.nn import GCNConv
+from torch_scatter import scatter_max
 from skimage.segmentation import slic
 import numpy as np
 from PIL import Image
@@ -49,16 +51,37 @@ def SuperpixelEncoder(x):
 class GraphConvModule(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim):
         super(GraphConvModule, self).__init__()
-        self.conv1 = GCNConv(input_dim, hidden_dim)
-        self.conv2 = GCNConv(hidden_dim, output_dim)
+        # self.conv1 = GCNConv(input_dim, hidden_dim)
+        # self.conv2 = GCNConv(hidden_dim, output_dim)
+        self.conv1 = GCNConv(input_dim, 16)
+        self.conv2 = GCNConv(16, 32)
+        self.conv3 = GCNConv(32, 48)
+        self.conv4 = GCNConv(48, 64)
+        self.conv5 = GCNConv(64, 96)
+        self.conv6 = GCNConv(96, 128)
+        self.linear1 = torch.nn.Linear(128, 64)
+        self.linear2 = torch.nn.Linear(64, output_dim)
 
     def forward(self, data):
+        data.to('cuda:0')
         x, edge_index = data.x, data.edge_index
-        # 第一层GCN
+
         x = self.conv1(x, edge_index)
-        x = x.relu()
-        # 第二层GCN
+        x = F.relu(x)
         x = self.conv2(x, edge_index)
+        x = F.relu(x)
+        x = self.conv3(x, edge_index)
+        x = F.relu(x)
+        x = self.conv4(x, edge_index)
+        x = F.relu(x)
+        x = self.conv5(x, edge_index)
+        x = F.relu(x)
+        x = self.conv6(x, edge_index)
+        x = F.relu(x)
+        x, _ = scatter_max(x, data.batch, dim=0)
+        x = self.linear1(x)
+        x = F.relu(x)
+        x = self.linear2(x)
         return x
 
 
@@ -68,7 +91,7 @@ input_tensor = torch.randn(1, 3, 256, 256)  # (batch_size, channels, height, wid
 features, edges = SuperpixelEncoder(input_tensor)
 
 data = Data(x=features, edge_index=edges)
-model = GraphConvModule(input_dim=features.shape[1], hidden_dim=16, output_dim=32)
+model = GraphConvModule(input_dim=features.shape[1], hidden_dim=16, output_dim=32).cuda()
 
 # Define loss function and optimizer
 criterion = nn.CrossEntropyLoss()
@@ -85,5 +108,3 @@ for epoch in range(200):
     loss.backward()
     optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
-
-

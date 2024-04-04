@@ -9,8 +9,8 @@ from skimage.segmentation import slic
 from PIL import Image
 import matplotlib.pyplot as plt
 
-from cnn_layer import *
-from slic2gcn import *
+from .cnn_layer import *
+from .slic2gcn import *
 
 
 def get_in_channels(feat_scales, inner_channel, channel_multiplier):
