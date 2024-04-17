@@ -105,7 +105,7 @@ class CD(BaseModel):
         logger.info(s)
 
     # Saving the network parameters
-    def save_network(self, epoch, is_best_model = False):
+    def save_network(self, epoch, is_best_model=False):
         cd_gen_path = os.path.join(
             self.opt['path']['checkpoint'], 'cd_model_E{}_gen.pth'.format(epoch))
         cd_opt_path = os.path.join(
