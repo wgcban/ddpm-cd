@@ -5,7 +5,6 @@ import torch.nn as nn
 from torch.nn import init
 from torch.nn import modules
 logger = logging.getLogger('base')
-from model.cd_modules.cd_head import cd_head
 from model.cd_modules.cd_head_v2 import cd_head_v2, get_in_channels
 from thop import profile, clever_format
 import copy
@@ -121,24 +120,19 @@ def define_G(opt):
         netG = nn.DataParallel(netG)
     return netG
 
+
 # Change Detection Network
 def define_CD(opt):
     cd_model_opt = opt['model_cd']
     diffusion_model_opt = opt['model']
     
     # Define change detection network head
-    # netCD = cd_head(feat_scales=cd_model_opt['feat_scales'], 
-    #                 out_channels=cd_model_opt['out_channels'], 
-    #                 inner_channel=diffusion_model_opt['unet']['inner_channel'], 
-    #                 channel_multiplier=diffusion_model_opt['unet']['channel_multiplier'],
-    #                 img_size=cd_model_opt['output_cm_size'],
-    #                 psp=cd_model_opt['psp'])
-    netCD = cd_head_v2(feat_scales=cd_model_opt['feat_scales'], 
-                    out_channels=cd_model_opt['out_channels'], 
-                    inner_channel=diffusion_model_opt['unet']['inner_channel'], 
-                    channel_multiplier=diffusion_model_opt['unet']['channel_multiplier'],
-                    img_size=cd_model_opt['output_cm_size'],
-                    time_steps=cd_model_opt["t"])
+    netCD = cd_head_v2(feat_scales=cd_model_opt['feat_scales'],
+                       out_channels=cd_model_opt['out_channels'],
+                       inner_channel=diffusion_model_opt['unet']['inner_channel'],
+                       channel_multiplier=diffusion_model_opt['unet']['channel_multiplier'],
+                       img_size=cd_model_opt['output_cm_size'],
+                       time_steps=cd_model_opt["t"])
     
     # Initialize the change detection head if it is 'train' phase 
     if opt['phase'] == 'train':
@@ -153,19 +147,19 @@ def define_CD(opt):
     f_A, f_B = [], [] 
     feat_scales = cd_model_opt['feat_scales'].copy()
     feat_scales.sort(reverse=True)
-    h,w=8,8
+    h, w = 8, 8
     for i in range(0, len(feat_scales)):
         dim = get_in_channels([feat_scales[i]], diffusion_model_opt['unet']['inner_channel'], diffusion_model_opt['unet']['channel_multiplier'])
-        A = torch.randn(1,dim,h,w).cuda()
-        B = torch.randn(1,dim,h,w).cuda()
+        A = torch.randn(1, dim, h, w).cuda()
+        B = torch.randn(1, dim, h, w).cuda()
         f_A.append(A)
         f_B.append(B)
         f_A.append(A)
         f_B.append(B)
         f_A.append(A)
         f_B.append(B)
-        h*=2
-        w*=2
+        h *= 2
+        w *= 2
     f_A_r = [ele for ele in reversed(f_A)]
     f_B_r = [ele for ele in reversed(f_B)]
 
@@ -175,7 +169,7 @@ def define_CD(opt):
         print(t_i)
         F_A.append(f_A_r)
         F_B.append(f_B_r)
-    flops, params = profile(copy.deepcopy(netCD).cuda(), inputs=(F_A,F_B,), verbose=False)
+    flops, params = profile(copy.deepcopy(netCD).cuda(), inputs=(F_A, F_B,), verbose=False)
     flops, params = clever_format([flops, params])
     netGcopy = copy.deepcopy(netCD).cuda()
     netGcopy.eval()
