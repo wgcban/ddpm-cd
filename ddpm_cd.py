@@ -189,7 +189,7 @@ if __name__ == "__main__":
                       (current_epoch, n_epoch-1, logs['epoch_acc'])
             for k, v in logs.items():
                 message += '{:s}: {:.4e} '.format(k, v)
-                tb_logger.add_scalar(k, v, current_step)
+                tb_logger.add_scalar(k, v, current_step + start_epoch*len(train_loader))
             message += '\n'
             logger.info(message)
             
@@ -284,7 +284,7 @@ if __name__ == "__main__":
                       (current_epoch, n_epoch-1, logs['epoch_acc'])
                 for k, v in logs.items():
                     message += '{:s}: {:.4e} '.format(k, v)
-                    tb_logger.add_scalar(k, v, current_step)
+                    tb_logger.add_scalar(k, v, current_step + start_epoch*len(val_loader))
                 message += '\n'
                 logger.info(message)
 
