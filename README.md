@@ -1,4 +1,4 @@
-# DDPM-CD: Denoising Diffusion Probabilistic Models as Feature Extractors for Change Detection
+# DDPM-CD: Denoising Diffusion Probabilistic Models as Feature Extractors for Change Detection (WACV'25)
 (Previosely: DDPM-CD: Remote Sensing Change Detection using Denoising Diffusion Probabilistic Models)
 
 > [Wele Gedara Chaminda Bandara](https://www.wgcban.com), [Nithin Gopalakrishnan Nair](https://nithin-gk.github.io), [Vishal M. Patel](https://engineering.jhu.edu/faculty/vishal-patel/)
