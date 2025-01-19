@@ -105,7 +105,7 @@ class CD(BaseModel):
         logger.info(s)
 
     # Saving the network parameters
-    def save_network(self, epoch, is_best_model = False):
+    def save_network(self, epoch, is_best_model=False):
         cd_gen_path = os.path.join(
             self.opt['path']['checkpoint'], 'cd_model_E{}_gen.pth'.format(epoch))
         cd_opt_path = os.path.join(
@@ -128,7 +128,6 @@ class CD(BaseModel):
         if is_best_model:
             torch.save(state_dict, best_cd_gen_path)
 
-
         # Save CD optimizer paramers
         opt_state = {'epoch': epoch,
                      'scheduler': None, 
@@ -143,7 +142,7 @@ class CD(BaseModel):
             'Saved current CD model in [{:s}] ...'.format(cd_gen_path))
         if is_best_model:
             logger.info(
-            'Saved best CD model in [{:s}] ...'.format(best_cd_gen_path))
+                'Saved best CD model in [{:s}] ...'.format(best_cd_gen_path))
 
     # Loading pre-trained CD network
     def load_network(self):
@@ -200,5 +199,3 @@ class CD(BaseModel):
     # Finctions related to learning rate sheduler
     def _update_lr_schedulers(self):
         self.exp_lr_scheduler_netCD.step()
-
-        
