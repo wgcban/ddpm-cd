@@ -1,8 +1,21 @@
+"""
+SR3-style UNet for DDPM with intermediate feature extraction.
+
+This UNet extends diffusers ModelMixin/ConfigMixin for save_pretrained/from_pretrained
+support, while retaining the custom `feat_need` flag needed for change detection.
+
+diffusers' built-in UNet2DModel does NOT expose intermediate encoder/decoder features,
+so this custom implementation is necessary.
+"""
+
 import math
 import torch
 from torch import nn
 import torch.nn.functional as F
 from inspect import isfunction
+
+from diffusers.configuration_utils import ConfigMixin, register_to_config
+from diffusers.models.modeling_utils import ModelMixin
 
 
 def exists(x):
@@ -14,8 +27,9 @@ def default(val, d):
         return val
     return d() if isfunction(d) else d
 
-# PositionalEncoding Source： https://github.com/lmnt-com/wavegrad/blob/master/src/wavegrad/model.py
+
 class PositionalEncoding(nn.Module):
+    """Sinusoidal positional encoding for noise level embedding."""
     def __init__(self, dim):
         super().__init__()
         self.dim = dim
@@ -72,9 +86,6 @@ class Downsample(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
-
-
-# building block modules
 
 
 class Block(nn.Module):
@@ -157,10 +168,24 @@ class ResnetBlocWithAttn(nn.Module):
             x = self.attn(x)
         return x
 
-def Reverse(lst):
+
+def _reverse(lst):
     return [ele for ele in reversed(lst)]
 
-class UNet(nn.Module):
+
+class UNet(ModelMixin, ConfigMixin):
+    """
+    SR3-style UNet with noise-level conditioning.
+
+    Unlike diffusers' UNet2DModel, this model supports ``feat_need=True`` in
+    :meth:`forward` to return intermediate encoder and decoder feature maps,
+    which are required by the change-detection heads.
+
+    Supports ``save_pretrained`` / ``from_pretrained`` via
+    :class:`~diffusers.ModelMixin`.
+    """
+
+    @register_to_config
     def __init__(
         self,
         in_channel=6,
@@ -168,7 +193,7 @@ class UNet(nn.Module):
         inner_channel=32,
         norm_groups=32,
         channel_mults=(1, 2, 4, 8, 8),
-        attn_res=(8),
+        attn_res=(8,),
         res_blocks=3,
         dropout=0,
         with_noise_level_emb=True,
@@ -193,7 +218,7 @@ class UNet(nn.Module):
         feat_channels = [pre_channel]
         now_res = image_size
 
-        self.init_conv      = nn.Conv2d(in_channels=in_channel, out_channels=inner_channel, kernel_size=3, padding=1)
+        self.init_conv = nn.Conv2d(in_channels=in_channel, out_channels=inner_channel, kernel_size=3, padding=1)
         downs = []
         for ind in range(num_mults):
             is_last = (ind == num_mults - 1)
@@ -236,13 +261,19 @@ class UNet(nn.Module):
         self.final_conv = Block(pre_channel, default(out_channel, in_channel), groups=norm_groups)
 
     def forward(self, x, time, feat_need=False):
+        """
+        Args:
+            x: noisy input image, shape ``(B, C, H, W)``
+            time: noise level embedding, shape ``(B, 1)`` or ``(B,)``
+            feat_need: if ``True``, return ``(encoder_feats, decoder_feats)``
+                       instead of the denoised output.
+        """
         t = self.noise_level_mlp(time) if exists(
             self.noise_level_mlp) else None
 
-        # First downsampling layer
-        x  = self.init_conv(x)
+        x = self.init_conv(x)
 
-        # Diffusion encoder
+        # Encoder
         feats = [x]
         for layer in self.downs:
             if isinstance(layer, ResnetBlocWithAttn):
@@ -250,22 +281,21 @@ class UNet(nn.Module):
             else:
                 x = layer(x)
             feats.append(x)
-        
+
         if feat_need:
             fe = feats.copy()
 
-        # Passing through middle layer
+        # Middle
         for layer in self.mid:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(x, t)
             else:
                 x = layer(x)
 
-        # Saving decoder features for CD Head
         if feat_need:
             fd = []
 
-        # Diffiusion decoder
+        # Decoder
         for layer in self.ups:
             if isinstance(layer, ResnetBlocWithAttn):
                 x = layer(torch.cat((x, feats.pop()), dim=1), t)
@@ -274,11 +304,9 @@ class UNet(nn.Module):
             else:
                 x = layer(x)
 
-        # Final Diffusion layer
         x = self.final_conv(x)
 
-        # Output encoder and decoder features if feat_need
         if feat_need:
-            return fe, Reverse(fd)
+            return fe, _reverse(fd)
         else:
             return x

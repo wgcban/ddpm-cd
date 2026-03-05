@@ -4,7 +4,7 @@ from PIL import Image
 import torch
 from torch.utils.data import Dataset
 import random
-import data.util as Util
+import src.datasets.util as Util
 import scipy
 import scipy.io
 import os.path
@@ -32,7 +32,7 @@ def get_img_path(root_dir, img_name):
 
 
 def get_label_path(root_dir, img_name):
-    return os.path.join(root_dir, ANNOT_FOLDER_NAME, img_name) #.replace('.jpg', label_suffix)
+    return os.path.join(root_dir, ANNOT_FOLDER_NAME, img_name)
 
 class CDDataset(Dataset):
     def __init__(self, dataroot, resolution=256, split='train', data_len=-1):

@@ -4,8 +4,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.padding import ReplicationPad2d
-from model.cd_modules.psp import _PSPModule
-from model.cd_modules.se import ChannelSpatialSELayer
+from src.models.cd_modules.psp import _PSPModule
+from src.models.cd_modules.se import ChannelSpatialSELayer
 
 def get_in_channels(feat_scales, inner_channel, channel_multiplier):
     '''
@@ -117,5 +117,3 @@ class cd_head_v2(nn.Module):
         cm = self.clfr_stg2(self.relu(self.clfr_stg1(x)))
 
         return cm
-
-    
